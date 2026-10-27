@@ -1,0 +1,25 @@
+Chronologic VCS simulator copyright 1991-2025
+Contains Synopsys proprietary information.
+Compiler version X-2025.06-SP2-6_Full64; Runtime version X-2025.06-SP2-6_Full64;  Oct 26 15:29 2026
+
+ VCS Coverage Metrics Release X-2025.06-SP2-6_Full64 Copyright (c) 1991-2025 by Synopsys Inc.
+*Verdi* Loading libsscore_vcs202506.so
+FSDB Dumper for VCS, Release Verdi_Y-2026.03-SP2, Linux x86_64/64bit, 08/29/2026
+(C) 1996 - 2026 by Synopsys, Inc.
+*Verdi* : Create FSDB file 'ondas_proyecto.fsdb'
+*Verdi* : Begin traversing the scope (tb_alu_wrapper), layer (0).
+*Verdi* : Enable +all dumping.
+*Verdi* : End of traversing.
+$finish called from file "rtl/tb_alu_wrapper.sv", line 42.
+$finish at simulation time               300000
+
+---------------------------------------------------------------------------
+VCS Coverage Metrics: during simulation line, cond, branch, tgl was monitored
+---------------------------------------------------------------------------
+
+ Coverage status: End of All Coverages ...
+
+           V C S   S i m u l a t i o n   R e p o r t 
+Time: 300000 ps
+CPU Time:      0.320 seconds;       Data structure size:   0.1Mb
+Mon Oct 26 15:30:00 2026

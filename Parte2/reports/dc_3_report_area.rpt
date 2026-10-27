@@ -1,0 +1,43 @@
+ 
+****************************************
+Report : area
+Design : alu_wrapper
+Version: X-2025.06-SP5-5
+Date   : Mon Oct 26 15:31:55 2026
+****************************************
+
+Library(s) Used:
+
+    M31LLSC750GL150MS_25CTT1P8_ctyp_ccs (File: /home/framazzini/mi_proyecto_asic/pdk/M31LLSC750GL150MS_00.01.000-20261022T233445Z-1-001/M31LLSC750GL150MS_00.01.000/ccs_db/M31LLSC750GL150MS_25CTT1P8_ctyp_ccs.db)
+
+Number of ports:                           57
+Number of nets:                          1136
+Number of cells:                         1088
+Number of combinational cells:            900
+Number of sequential cells:               188
+Number of macros/black boxes:               0
+Number of buf/inv:                        182
+Number of references:                      61
+
+Combinational area:              13497.523295
+Buf/Inv area:                     1453.132802
+Noncombinational area:            8580.096027
+Macro/Black Box area:                0.000000
+Net Interconnect area:      undefined  (Wire load has zero net area)
+
+Total cell area:                 22077.619322
+Total area:                 undefined
+
+Hierarchical area distribution
+------------------------------
+
+                                  Global cell area            Local cell area
+                                  -------------------  ----------------------------- 
+Hierarchical cell                 Absolute    Percent  Combi-      Noncombi-  Black-
+                                  Total       Total    national    national   boxes   Design
+--------------------------------  ----------  -------  ----------  ---------  ------  ---------
+alu_wrapper                       22077.6193    100.0  13497.5233  8580.0960  0.0000  alu_wrapper
+--------------------------------  ----------  -------  ----------  ---------  ------  ---------
+Total                                                  13497.5233  8580.0960  0.0000
+
+1

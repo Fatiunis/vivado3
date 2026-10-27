@@ -1,0 +1,2085 @@
+
+
+
+                              IC Compiler II (TM)
+
+                Version Y-2026.03-SP2 for linux64 - Sep 01, 2026
+                           Base build date 6/22/2026.
+
+                    Copyright (c) 1988 - 2026 Synopsys, Inc.
+   This software and the associated documentation are proprietary to Synopsys,
+      Inc.  This software may only be used in accordance with the terms and
+  conditions of a written license agreement with Synopsys, Inc.  All other use,
+   reproduction, or distribution of this software is strictly prohibited.  By
+   installing, accessing, using, or executing this software, you agree that it
+  will reside on, operate within, and have access to the computers and networks
+    where such software is used ("Host System"), and that Synopsys may access
+     components and data of the Host System as necessary for it to function
+ properly, to authenticate and validate license keys, to verify that it is used
+ only in conformity with the applicable license restrictions, and to communicate
+                 error messages and associated data to Synopsys.
+
+ 
+Invocation: /usr/synopsys/icc2/Y-2026.03-SP2/linux64/nwtn/bin/icc2_exec
+Execution time: Mon Oct 26 15:32:24 2026
+Host: synopsys-unis (1 x 2717.425 MHz Intel(R) Xeon(R) D-2123IT CPU @ 2.20GHz)
+Working directory: /home/framazzini/mi_proyecto_asic
+
+set DESIGN_NAME "alu_wrapper"
+alu_wrapper
+set TECH_FILE "/home/framazzini/mi_proyecto_asic/pdk/M31LLSC750GL150MS_00.01.000-20261022T233445Z-1-001/M31LLSC750GL150MS_00.01.000/M31LLSC750GL150MS.0.01/milkyway_techfiles/tech/GL150M_5M1T_9K.tf"
+/home/framazzini/mi_proyecto_asic/pdk/M31LLSC750GL150MS_00.01.000-20261022T233445Z-1-001/M31LLSC750GL150MS_00.01.000/M31LLSC750GL150MS.0.01/milkyway_techfiles/tech/GL150M_5M1T_9K.tf
+set REF_NDM   "(HOME)/mi_proyecto_asic/M31LLSC750GL150MS.ndm"
+(HOME)/mi_proyecto_asic/M31LLSC750GL150MS.ndm
+if {[file exists "${DESIGN_NAME}_lib.ndm"]} { file delete -force "${DESIGN_NAME}_lib.ndm" }
+create_lib ${DESIGN_NAME}_lib.ndm -technology $TECH_FILE -ref_libs $REF_NDM
+Information: Loading technology file '/home/framazzini/mi_proyecto_asic/pdk/M31LLSC750GL150MS_00.01.000-20261022T233445Z-1-001/M31LLSC750GL150MS_00.01.000/M31LLSC750GL150MS.0.01/milkyway_techfiles/tech/GL150M_5M1T_9K.tf' (FILE-007)
+{alu_wrapper_lib.ndm}
+read_verilog -top $DESIGN_NAME outputs/${DESIGN_NAME}_mapped.v
+Information: Reading Verilog into new design 'alu_wrapper' in library 'alu_wrapper_lib.ndm'. (VR-012)
+Loading verilog file '/home/framazzini/mi_proyecto_asic/outputs/alu_wrapper_mapped.v'
+Information: tri converted to a wire with no special attributes
+            	at line 123 in /home/framazzini/mi_proyecto_asic/outputs/alu_wrapper_mapped.v (SVR-21)
+Information: tri converted to a wire with no special attributes
+            	at line 124 in /home/framazzini/mi_proyecto_asic/outputs/alu_wrapper_mapped.v (SVR-21)
+Number of modules read: 1
+Top level ports: 57
+Total ports in all modules: 57
+Total nets in all modules: 1137
+Total instances in all modules: 1088
+Elapsed = 00:00:00.05, CPU = 00:00:00.01
+1
+current_block $DESIGN_NAME
+{alu_wrapper_lib.ndm:alu_wrapper.design}
+link_block
+Using libraries: alu_wrapper_lib.ndm M31LLSC750GL150MS
+Linking block alu_wrapper_lib.ndm:alu_wrapper.design
+Information: User units loaded from library 'M31LLSC750GL150MS' (LNK-040)
+Design 'alu_wrapper' was successfully linked.
+1
+set_app_options -name place.coarse.continue_on_missing_scandef -value true
+place.coarse.continue_on_missing_scandef true
+set routing_layers [get_layers -quiet -filter "layer_type == interconnect"]
+{METAL1 METAL2 METAL3 METAL4 METAL5}
+set dir "horizontal"
+horizontal
+foreach_in_collection lyr $routing_layers {
+    set lyr_name [get_object_name $lyr]
+    if {[string match -nocase "M" $lyr_name]} {
+        catch {set_attribute $lyr routing_direction $dir}
+        if {$dir eq "horizontal"} { set dir "vertical" } else { set dir "horizontal" }
+    }
+}
+remove_corners -all; remove_modes -all; remove_scenarios -all
+1
+create_corner typical
+1
+create_mode func
+1
+create_scenario -mode func -corner typical -name func_typical
+Created scenario func_typical for mode func and corner typical
+All analysis types are activated.
+{func_typical}
+current_scenario func_typical
+{func_typical}
+read_sdc outputs/${DESIGN_NAME}_mapped.sdc
+Information: Loading SDC version 2.2 file '/home/framazzini/mi_proyecto_asic/outputs/alu_wrapper_mapped.sdc' (FILE-007)
+Information: Timer using 1 threads
+Timing Update Started(Full_timing_update) : updateCount: 1 / Mem-peak : 626 MB / Date: Mon Oct 26 15:33:34 2026
+
+Timing Update Completed: Mem-peak: 626 MB / Date: Mon Oct 26 15:33:34 2026
+
+1
+set_scenario_status func_typical -active true -setup true -hold true
+Scenario func_typical (mode func corner typical) is active for setup/hold/leakage_power/dynamic_power/max_transition/max_capacitance/min_capacitance analysis.
+1
+proc conectar_pg {} {
+    if {[sizeof_collection [get_nets -quiet VDD]] == 0} { create_net -power VDD }
+    if {[sizeof_collection [get_nets -quiet VSS]] == 0} { create_net -ground VSS }
+    set pwr_pins [get_pins -quiet -physical_context -filter "port_type == power"]
+    set gnd_pins [get_pins -quiet -physical_context -filter "port_type == ground"]
+    if {[sizeof_collection $pwr_pins] > 0} { catch {connect_pg_net -net VDD $pwr_pins} }
+    if {[sizeof_collection $gnd_pins] > 0} { catch {connect_pg_net -net VSS $gnd_pins} }
+    catch {connect_pg_net -automatic}
+}
+initialize_floorplan -core_utilization 0.65 -core_offset {5.0 5.0 5.0 5.0}
+Warning: The routing directions for layer 'METAL1 METAL2 METAL3 METAL4 METAL5 ' are missing. Auto deriving 'horizontal' routing direction for layer 'METAL1'. (DPUI-924)
+Warning: The routing directions for layer 'METAL1 METAL2 METAL3 METAL4 METAL5 ' are missing. Auto deriving 'vertical' routing direction for layer 'METAL2'. (DPUI-924)
+Warning: The routing directions for layer 'METAL1 METAL2 METAL3 METAL4 METAL5 ' are missing. Auto deriving 'horizontal' routing direction for layer 'METAL3'. (DPUI-924)
+Warning: The routing directions for layer 'METAL1 METAL2 METAL3 METAL4 METAL5 ' are missing. Auto deriving 'vertical' routing direction for layer 'METAL4'. (DPUI-924)
+Warning: The routing directions for layer 'METAL1 METAL2 METAL3 METAL4 METAL5 ' are missing. Auto deriving 'horizontal' routing direction for layer 'METAL5'. (DPUI-924)
+Use site_def 'unit' to initialize floorplan.
+Removing existing floorplan objects
+Creating core...
+Core utilization ratio = 66.19%
+Unplacing all cells...
+Creating site array...
+Creating routing tracks...
+Initializing floorplan completed.
+catch {create_track}
+Error: Required argument '-layer' was not found (CMD-007)
+1
+place_pins -self
+Information: Starting 'place_pins' (FLW-8000)
+Information: Time: 2026-10-26 15:33:34 / Session:  00:01:22 / Command:  00:00:00 / CPU:  00:00:00 / Memory: 627 MB (FLW-8100)
+Information: The command 'place_pins' cleared the undo history. (UNDO-016)
+Load DB...
+CPU Time for load db: 00:00:00.00u 00:00:00.00s 00:00:00.00e: 
+
+Min routing layer: METAL1
+Max routing layer: METAL5
+
+
+CPU Time for Top Level Pre-Route Processing: 00:00:00.00u 00:00:00.00s 00:00:00.00e: 
+CPU Time for Leaf Level Pre-Route Processing: 00:00:00.00u 00:00:00.00s 00:00:00.00e: 
+Number of block ports: 57
+Number of block pin locations assigned from router: 0
+CPU Time for Pin Preparation: 00:00:00.00u 00:00:00.00s 00:00:00.00e: 
+Number of PG ports on blocks: 0
+Number of pins created: 57
+CPU Time for Pin Creation: 00:00:00.01u 00:00:00.00s 00:00:00.01e: 
+Total Pin Placement CPU Time: 00:00:00.01u 00:00:00.00s 00:00:00.01e: 
+Information: Ending   'place_pins' (FLW-8001)
+Information: Time: 2026-10-26 15:33:34 / Session:  00:01:22 / Command:  00:00:00 / CPU:  00:00:00 / Memory: 627 MB (FLW-8100)
+1
+conectar_pg
+Information: Connecting to PG and tie pins in automatic mode. (MV-396)
+****************************************
+Report : Power/Ground Connection Summary
+Design : alu_wrapper
+Version: Y-2026.03-SP2
+Date   : Mon Oct 26 15:33:34 2026
+****************************************
+P/G net name                  P/G pin count(previous/current)
+--------------------------------------------------------------------------------
+Power net VDD                 1088/1088
+Ground net VSS                1088/1088
+--------------------------------------------------------------------------------
+Information: connections of 0 power/ground pin(s) are created or changed. (MV-382)
+
+0
+if {[catch {place_opt} err_place]} { create_placement -effort high; legalize_placement }
+Information: Starting 'place_opt' (FLW-8000)
+Information: Time: 2026-10-26 15:33:34 / Session:  00:01:22 / Command:  00:00:00 / CPU:  00:00:00 / Memory: 627 MB (FLW-8100)
+Information: The command 'place_opt' cleared the undo history. (UNDO-016)
+INFO: place_opt is running in balanced flow mode
+Warning: no valid parasitic for typical corner(LATE) (NEX-018)
+Warning: no valid parasitic for typical corner(EARLY) (NEX-018)
+Warning: no valid parasitic for (all corners) corner((both specs)) (NEX-018)
+Error: No corner has valid parasitic. Please provide valid parasitic for at least one corner.
+Warning: Cannot find any default max transition constraint on the design. (OPT-070)
+Information: Running auto PG connection. (NDM-099)
+
+Information: Runtime Summary (All Commands) (FLW-9000)
+----------------------------------------------------------------------------
+    Elapse (Hrs)   Elapse (%)       CPU/Elapse       Category
+----------------------------------------------------------------------------
+      0.00          100.0%             1.0           Other 
+----------------------------------------------------------------------------
+      0.00          100.0%             1.0           Total 
+----------------------------------------------------------------------------
+
+Host Options:
+-------------
+Max cores: 1
+
+Machine Spec:
+-------------
+Intel(R) Xeon(R) D-2123IT CPU @ 2.20GHz / 8 CPUs  
+Sockets: 1, Cores: 4, HT/SMT, not-VM
+----------------------------------------------------------------------------
+
+Information: Running auto PG connection. (NDM-099)
+Information: Ending   'place_opt' (FLW-8001)
+Information: Time: 2026-10-26 15:33:34 / Session:  00:01:22 / Command:  00:00:00 / CPU:  00:00:00 / Memory: 691 MB (FLW-8100)
+Information: Starting 'create_placement' (FLW-8000)
+Information: Time: 2026-10-26 15:33:35 / Session:  00:01:22 / Command:  00:00:00 / CPU:  00:00:00 / Memory: 691 MB (FLW-8100)
+
+Create Placement Options:
+Effort:                        high_effort         
+Timing Driven:                 false               
+Buffering Aware Timing Driven: false               
+Seed locs:                     false               
+Incremental:                   false               
+Congestion:                    false               
+Fix Macros:                    true                
+Place Macros:                  false               
+Channel Size Macros:           false               
+
+Printing options for 'place.coarse.*' (non-default only)
+place.coarse.continue_on_missing_scandef                :	 true                
+
+Information: Corner typical: no PVT mismatches. (PVT-032)
+Information: Pin/Port with maximum arrivals in mode: 'func',  'rst_n'   : '1'. (TIM-134)
+Information: Average arrivals per pin/port in mode: 'func' : '0'. (TIM-136)
+Corner Scaling is off, multiplier is 1.000000
+Corner typical has no valid parasitics. Ignoring
+Warning: no valid parasitic for typical corner(LATE) (NEX-018)
+Warning: no valid parasitic for typical corner(LATE) (NEX-018)
+Warning: no valid parasitic for typical corner(LATE) (NEX-018)
+Warning: no valid parasitic for typical corner(LATE) (NEX-018)
+Information: timingScenario func_typical timingCorner typical.  Using corner typical for worst leakage corner. (OPT-078)
+nplLib: default vr hor dist = 3617
+nplLib: default vr ver dist = 3617
+nplLib: default vr buf size = 20
+nplLib: default vr buf size = 3
+Placer using max_unbuffered_distance = 3616.97
+Info: embedded eLpp will optimize for scenario func_typical
+Information: Activity propagation will be performed for scenario func_typical.
+Information: Doing activity propagation for mode 'func' and corner 'typical' with effort level 'medium'. (POW-024)
+Information: Timer-derived activity data is cached on scenario func_typical (POW-052)
+Information: Running switching activity propagation in scalar mode!
+
+ **** Information : No. of simulation cycles = 6 ****
+Info: e-eLpp used with low effort
+Information: using ELPP mode 2
+Start transferring placement data.
+Warning: no valid parasitic for typical corner(LATE) (NEX-018)
+Warning: no valid parasitic for typical corner(EARLY) (NEX-018)
+Warning: no valid parasitic for (all corners) corner((both specs)) (NEX-018)
+Information: The stitching and editing of coupling caps is turned OFF for design 'alu_wrapper_lib.ndm:alu_wrapper.design'. (TIM-125)
+Warning: The extractor can not be initialized for block 'alu_wrapper'. (TIM-103)
+Warning: The extractor can not be initialized for design 'alu_wrapper'. Zero interconnect delay is used in timing analysis. (TIM-102)
+Warning: Batch extraction is skipped for block "alu_wrapper"
+Information: Update timing completed net estimation for all the timing graph nets (TIM-111)
+Information: Net estimation statistics: timing graph nets = 1136, routed nets = 0, across physical hierarchy nets = 0, parasitics cached nets = 0, delay annotated nets = 0, parasitics annotated nets = 0, multi-voltage nets = 0. (TIM-112)
+************************************************************
+Timer Settings:
+Delay Calculation Style:                   auto
+Signal Integrity Analysis:                 disabled
+Timing Window Analysis:                    disabled
+Advanced Waveform Propagation:             disabled
+Variation Type:                            fixed_derate
+Clock Reconvergence Pessimism Removal:     disabled
+Advanced Receiver Model:                   disabled
+LLE:                                       disabled
+ML Acceleration:                           off
+Smart Arc Optimization:                    disabled
+************************************************************
+ELPPver2: wire length prioritization enabled
+****** eLpp estimated wire length 
+1.87915% of the net wire length are clock nets
+0% of the clock net wire length has no activity
+Clock net wire length: 3.77541e+06
+Total net wire length: 2.00911e+08
+****** eLpp weights (no caps) (no lengths)
+Number of nets: 1136, of which 1135 non-clock nets
+Number of nets with 0 toggle rate: 0 (0%)
+Max toggle rate = 0.2, average toggle rate = 0.0127208
+Max non-clock toggle rate = 0.0289286
+eLpp weight range = (0.0807671, 15.7222)
+*** 2 nets are filtered out
+****** Net weight manager: report ******
+Weights included: eLpp  PostEffort  
+Number of nets with non-default weights: 1136
+Amt power = 0.1
+Non-default weight range: (0.908077, 6.47222)
+                             Min         Max         Avg       Stdev        Skew
+       Toggle Rates   0.00102743         0.2   0.0127208  0.00820759     10.6218
+      Power Weights    0.0807671     15.7222    0.999999    0.645208     10.6218
+      Final Weights     0.908077     6.47222     1.00352    0.169124     29.7661
+Information: Automatic repeater spreading is enabled.
+Restructuring in 1 hierarchies
+CGRW: importing permutable pins & pairs, size 8 and above
+Completed transferring placement data.
+Running placement using 1 thread(s)
+Information: Enhanced Auto Density Control is used. (PLACE-098)
+Information: Enhanced auto density configuration is 13179.
+Information: Automatic density control has selected the following settings: max_density 0.60, congestion_driven_max_util 0.87. (PLACE-027)
+Information: HFW control 'on' invoked.
+Creating placement from scratch.
+coarse place 0% done.
+coarse place 17% done.
+coarse place 33% done.
+coarse place 50% done.
+coarse place 67% done.
+coarse place 83% done.
+coarse place 100% done.
+Information: Coarse placer wire length estimate = 35514.4
+Information: Coarse placer active wire length estimate = 636.278
+Information: Coarse placer weighted wire length estimate = 42126.7
+Start DFT optimization
+START_CMD: optimize_dft        CPU:     22 s ( 0.01 hr) ELAPSE:     87 s ( 0.02 hr) MEM-PEAK:   756 Mb Mon Oct 26 15:33:38 2026
+DFT optimization is skipped due to no scan chains were found
+END_CMD: optimize_dft          CPU:     22 s ( 0.01 hr) ELAPSE:     87 s ( 0.02 hr) MEM-PEAK:   756 Mb Mon Oct 26 15:33:38 2026
+End DFT optimization
+Start TieCellOpt
+Warning: no valid parasitic for typical corner(LATE) (NEX-018)
+Warning: no valid parasitic for typical corner(EARLY) (NEX-018)
+Warning: no valid parasitic for (all corners) corner((both specs)) (NEX-018)
+End TieCellOpt
+
+Information: Runtime Summary (create_placement)  (FLW-9000)
+----------------------------------------------------------------------------
+    Elapse (Hrs)   Elapse (%)       CPU/Elapse       Category
+----------------------------------------------------------------------------
+      0.00           99.0%             0.9           Placement 
+      0.00            1.0%             1.0           Other 
+      0.00            0.0%             1.0           DFT Opt 
+----------------------------------------------------------------------------
+      0.00          100.0%             0.9           Total 
+----------------------------------------------------------------------------
+
+Host Options:
+-------------
+Max cores: 1
+
+Machine Spec:
+-------------
+Intel(R) Xeon(R) D-2123IT CPU @ 2.20GHz / 8 CPUs  
+Sockets: 1, Cores: 4, HT/SMT, not-VM
+----------------------------------------------------------------------------
+
+Information: Ending   'create_placement' (FLW-8001)
+Information: Time: 2026-10-26 15:33:38 / Session:  00:01:26 / Command:  00:00:03 / CPU:  00:00:03 / Memory: 757 MB (FLW-8100)
+Information: Starting 'legalize_placement' (FLW-8000)
+Information: Time: 2026-10-26 15:33:38 / Session:  00:01:26 / Command:  00:00:00 / CPU:  00:00:00 / Memory: 757 MB (FLW-8100)
+nplDplc2Placer::setParam(effort,1)
+nplDplc2Placer::setParam(debug,0)
+nplDplc2Placer::setParam(site_check,2)
+nplDplc2Placer::setParam(app_firm_wgt,0)
+Warning: Site master "unit" has neither X-Symmetry nor Y-Symmetry. The "legal orientations" for the standard cells will be limited. (LGL-031)
+Warning: Routing direction of metal layer POLY2 is neither "horizontal" nor "vertical".  PDC checks will not be performed on this layer. (PDC-003)
+PDC app_options settings =========
+	place.legalize.enable_prerouted_net_check: 1
+	place.legalize.num_tracks_for_access_check: 1
+	place.legalize.use_eol_spacing_for_access_check: 0
+	place.legalize.allow_touch_track_for_access_check: 1
+	place.legalize.reduce_conservatism_in_eol_check: 0
+	place.legalize.preroute_shape_merge_distance: 0.0
+	place.legalize.enable_non_preferred_direction_span_check: 0
+
+Layer METAL1: cached 0 shapes out of 0 total shapes.
+Layer METAL2: cached 0 shapes out of 0 total shapes.
+Cached 0 vias out of 0 total vias.
+
+Legalizing Top Level Design alu_wrapper ... 
+Information: Initializing classic cellmap without advanced rules enabled and without PDC enabled
+Information: The following app options are used in cellmap
+        place.legalize.enable_color_aware_placement : false
+        place.legalize.use_nll_query_cm : false
+        place.legalize.enable_advanced_legalizer : false
+        place.legalize.enable_prerouted_net_check : true
+        place.legalize.enable_advanced_prerouted_net_check : false
+        place.legalize.always_continue : true
+        place.legalize.limit_legality_checks : false
+        place.common.pnet_aware_density : 1.0000
+        place.common.pnet_aware_min_width : 0.0000
+        place.common.pnet_aware_layers : {}
+        place.common.use_placement_model : false
+        place.common.enable_advanced_placement_model : true
+        cts.placement.cell_spacing_rule_style : maximum
+Total 0.0183 seconds to build cellmap data
+Information: Creating classic rule checker.
+Warning: Routing direction of metal layer POLY2 is neither "horizontal" nor "vertical".  PDC checks will not be performed on this layer. (PDC-003)
+=====> Processed 61 ref cells (0 fillers) from library
+
+Bounds/Regions In This Design:
+        Area    Num Cells  Exclusive Name
+ (square um)
+     33355.9         1088        Yes DEFAULT_VA
+
+Warning: max_legality_failures=5000 ignored.
+	To use it, set limit_legality_checks to true.
+Warning: max_legality_check_range=500 ignored.
+	To use it, set limit_legality_checks to true.
+Starting legalizer.
+Warning: Exclusive bound 'DEFAULT' has no cells.
+Optimizing Exclusive Bound 'DEFAULT_VA' (2/2)
+    Done Exclusive Bound 'DEFAULT_VA' (2/2) (0 sec)
+Legalization complete (0 total sec)
+
+****************************************
+  Report : Placement Attempts
+  Site   : unit
+****************************************
+
+number of cells:                   1088
+number of references:                61
+number of site rows:                 54
+number of locations attempted:    18007
+number of locations failed:           0  (0.0%)
+
+Legality of references at locations:
+0 references had failures.
+
+Legality of references in rows:
+0 references had row failures.
+
+****************************************
+  Report : Cell Displacements
+****************************************
+
+number of cells aggregated:        1088 (13689 total sites)
+avg row height over cells:        3.360 um
+rms cell displacement:            1.024 um ( 0.30 row height)
+rms weighted cell displacement:   1.024 um ( 0.30 row height)
+max cell displacement:            3.801 um ( 1.13 row height)
+avg cell displacement:            0.909 um ( 0.27 row height)
+avg weighted cell displacement:   0.909 um ( 0.27 row height)
+number of cells moved:             1088
+number of large displacements:        0
+large displacement threshold:     3.000 row height
+
+Displacements of worst 10 cells:
+Cell: U224 (BUFX1TAS7)
+  Input location: (10.144,112.082)
+  Legal location: (10.28,115.88)
+  Displacement:   3.801 um ( 1.13 row height)
+Cell: U1010 (NOR2X1TAS7)
+  Input location: (68.0886,143.09)
+  Legal location: (67.88,146.12)
+  Displacement:   3.038 um ( 0.90 row height)
+Cell: U1064 (CLKINVX1TAS7)
+  Input location: (12.9378,82.9026)
+  Legal location: (13.16,85.64)
+  Displacement:   2.746 um ( 0.82 row height)
+Cell: U282 (NAND2X1TAS7)
+  Input location: (175.862,79.7716)
+  Legal location: (175.88,82.28)
+  Displacement:   2.508 um ( 0.75 row height)
+Cell: U914 (CLKINVX1TAS7)
+  Input location: (63.0068,108.075)
+  Legal location: (62.6,105.8)
+  Displacement:   2.311 um ( 0.69 row height)
+Cell: U1094 (CLKINVX1TAS7)
+  Input location: (14.4226,61.6752)
+  Legal location: (12.2,62.12)
+  Displacement:   2.267 um ( 0.67 row height)
+Cell: U798 (NOR2X1TAS7)
+  Input location: (108.215,40.8482)
+  Legal location: (108.2,38.6)
+  Displacement:   2.248 um ( 0.67 row height)
+Cell: U582 (CLKINVX1TAS7)
+  Input location: (43.0779,120.449)
+  Legal location: (42.44,122.6)
+  Displacement:   2.243 um ( 0.67 row height)
+Cell: U428 (XNOR2X1TAS7)
+  Input location: (86.7933,26.309)
+  Legal location: (87.08,28.52)
+  Displacement:   2.230 um ( 0.66 row height)
+Cell: U1059 (NAND2X1TAS7)
+  Input location: (18.8038,63.425)
+  Legal location: (17,62.12)
+  Displacement:   2.226 um ( 0.66 row height)
+
+Legalization succeeded.
+Total Legalizer CPU: 0.171
+Total Legalizer Wall Time: 0.173
+----------------------------------------------------------------
+Information: Ending   'legalize_placement' (FLW-8001)
+Information: Time: 2026-10-26 15:33:39 / Session:  00:01:26 / Command:  00:00:00 / CPU:  00:00:00 / Memory: 757 MB (FLW-8100)
+1
+conectar_pg
+Information: Connecting to PG and tie pins in automatic mode. (MV-396)
+****************************************
+Report : Power/Ground Connection Summary
+Design : alu_wrapper
+Version: Y-2026.03-SP2
+Date   : Mon Oct 26 15:33:39 2026
+****************************************
+P/G net name                  P/G pin count(previous/current)
+--------------------------------------------------------------------------------
+Power net VDD                 1088/1088
+Ground net VSS                1088/1088
+--------------------------------------------------------------------------------
+Information: connections of 0 power/ground pin(s) are created or changed. (MV-382)
+
+0
+report_qor > reports/icc2_1_place_opt_qor.rpt
+if {[catch {clock_opt} err_cts]} { catch {synthesize_clock_trees}; catch {legalize_placement} }
+Information: Starting 'clock_opt' (FLW-8000)
+Information: Time: 2026-10-26 15:33:39 / Session:  00:01:27 / Command:  00:00:00 / CPU:  00:00:00 / Memory: 757 MB (FLW-8100)
+Information: The command 'clock_opt' cleared the undo history. (UNDO-016)
+INFO: Running medium effort clock_opt flow.
+INFO: clock_opt is running in balanced flow mode.
+Warning: no valid parasitic for typical corner(LATE) (NEX-018)
+Warning: no valid parasitic for typical corner(EARLY) (NEX-018)
+Warning: no valid parasitic for (all corners) corner((both specs)) (NEX-018)
+Error: No corner has valid parasitic. Please provide valid parasitic for at least one corner.
+Warning: Cannot find any default max transition constraint on the design. (OPT-070)
+
+Information: Runtime Summary (All Commands) (FLW-9000)
+----------------------------------------------------------------------------
+    Elapse (Hrs)   Elapse (%)       CPU/Elapse       Category
+----------------------------------------------------------------------------
+      0.00           76.2%             0.9           Placement 
+      0.00           23.8%             1.0           Other 
+      0.00            0.0%             1.0           DFT Opt 
+----------------------------------------------------------------------------
+      0.00          100.0%             0.9           Total 
+----------------------------------------------------------------------------
+
+Host Options:
+-------------
+Max cores: 1
+
+Machine Spec:
+-------------
+Intel(R) Xeon(R) D-2123IT CPU @ 2.20GHz / 8 CPUs  
+Sockets: 1, Cores: 4, HT/SMT, not-VM
+----------------------------------------------------------------------------
+
+Information: Running auto PG connection. (NDM-099)
+Information: Ending   'clock_opt' (FLW-8001)
+Information: Time: 2026-10-26 15:33:39 / Session:  00:01:27 / Command:  00:00:00 / CPU:  00:00:00 / Memory: 757 MB (FLW-8100)
+Information: Starting 'synthesize_clock_trees' (FLW-8000)
+Information: Time: 2026-10-26 15:33:39 / Session:  00:01:27 / Command:  00:00:00 / CPU:  00:00:00 / Memory: 757 MB (FLW-8100)
+Information: The value of option cts.compile.enable_cell_relocation has been overridden to "leaf_only" to support latency-driven placement. (CTS-973)
+************************************************************
+* CTS STEP: Design Initialization for Clock Synthesis
+************************************************************
+Information: Pin/Port with maximum arrivals in mode: 'func',  'rst_n'   : '1'. (TIM-134)
+Information: Average arrivals per pin/port in mode: 'func' : '0'. (TIM-136)
+Information: All clock objects will be converted from ideal to propagated clock during CTS. (CTS-105)
+Information: CTS will work on the following scenarios. (CTS-101)
+   func_typical	(Mode: func; Corner: typical)
+Information: CTS will work on all clocks in active scenarios, including 1 master clocks and 0 generated clocks. (CTS-107)
+Information: Clock min_layer constraint is relaxed for clock nets to use layers lower than user specified min layer, based on wire delay estimation. (CTS-093)
+Output units used in this log:
+   Time        : 1.00ns
+   Resistance  : 1.00kOhm
+   Capacitance : 1.00pF
+   Power       : 1.00pW
+   Length      : 1.00um
+Information: Clock derating is disabled
+
+CTS related app options set by user:
+   cts.common.enable_ndr_enhancement = 1
+
+Buffer/Inverter reference list for clock tree synthesis:
+   M31LLSC750GL150MS/BUFX1TAS7
+   M31LLSC750GL150MS/BUFX12TAS7
+   M31LLSC750GL150MS/BUFX16TAS7
+   M31LLSC750GL150MS/BUFX2TAS7
+   M31LLSC750GL150MS/BUFX20TAS7
+   M31LLSC750GL150MS/BUFX3TAS7
+   M31LLSC750GL150MS/BUFX4TAS7
+   M31LLSC750GL150MS/BUFX8TAS7
+   M31LLSC750GL150MS/CLKBUFX1TAS7
+   M31LLSC750GL150MS/CLKBUFX12TAS7
+   M31LLSC750GL150MS/CLKBUFX16TAS7
+   M31LLSC750GL150MS/CLKBUFX2TAS7
+   M31LLSC750GL150MS/CLKBUFX20TAS7
+   M31LLSC750GL150MS/CLKBUFX3TAS7
+   M31LLSC750GL150MS/CLKBUFX4TAS7
+   M31LLSC750GL150MS/CLKBUFX8TAS7
+   M31LLSC750GL150MS/DELAX1TAS7
+   M31LLSC750GL150MS/DELAX2TAS7
+   M31LLSC750GL150MS/DELAX4TAS7
+   M31LLSC750GL150MS/DELBX1TAS7
+   M31LLSC750GL150MS/DELBX2TAS7
+   M31LLSC750GL150MS/DELBX4TAS7
+   M31LLSC750GL150MS/DELCX1TAS7
+   M31LLSC750GL150MS/DELCX2TAS7
+   M31LLSC750GL150MS/DELCX4TAS7
+   M31LLSC750GL150MS/DELDX1TAS7
+   M31LLSC750GL150MS/DELDX2TAS7
+   M31LLSC750GL150MS/DELDX4TAS7
+   M31LLSC750GL150MS/CLKINVX1TAS7
+   M31LLSC750GL150MS/CLKINVX12TAS7
+   M31LLSC750GL150MS/CLKINVX16TAS7
+   M31LLSC750GL150MS/CLKINVX2TAS7
+   M31LLSC750GL150MS/CLKINVX20TAS7
+   M31LLSC750GL150MS/CLKINVX3TAS7
+   M31LLSC750GL150MS/CLKINVX4TAS7
+   M31LLSC750GL150MS/CLKINVX8TAS7
+   M31LLSC750GL150MS/INVX1TAS7
+   M31LLSC750GL150MS/INVX12TAS7
+   M31LLSC750GL150MS/INVX16TAS7
+   M31LLSC750GL150MS/INVX2TAS7
+   M31LLSC750GL150MS/INVX20TAS7
+   M31LLSC750GL150MS/INVX3TAS7
+   M31LLSC750GL150MS/INVX4TAS7
+   M31LLSC750GL150MS/INVX8TAS7
+
+ICG reference list:
+   M31LLSC750GL150MS/GCKHBQX1TAS7
+   M31LLSC750GL150MS/GCKHBQX2TAS7
+   M31LLSC750GL150MS/GCKHBQX4TAS7
+   M31LLSC750GL150MS/GCKLBQX1TAS7
+   M31LLSC750GL150MS/GCKLBQX2TAS7
+   M31LLSC750GL150MS/GCKLBQX4TAS7
+
+Warning: no valid parasitic for typical corner(LATE) (NEX-018)
+Warning: no valid parasitic for typical corner(EARLY) (NEX-018)
+Warning: no valid parasitic for (all corners) corner((both specs)) (NEX-018)
+Warning: Failed to get extraction information of wire
+Information: 'typical' is identified as primary corner for initial clock tree building. (CTS-103)
+Number of Site types in the design = 1
+Setting up Chip Core
+Chip Core shape: (50000 50000) (1888400 1864400)
+Number of VARs = 1
+Number of unique PDs = 1
+Number of Power Domains = 1
+Number of Voltage Areas = 1
+Number of supply Nets = 2
+Number of used supplies = 0
+Blocked VAs: 
+Warning: No clock routing rule is specified. (CTS-038)
+
+Clock cell spacing rule list:
+   No clock cell spacing rule is found.
+Information: The run time for design initialization is 0 hr : 0 min : 0.08 sec, cpu time is 0 hr : 0 min : 0.07 sec. (CTS-104)
+************************************************************
+* CTS STEP: Existing Clock Tree Removal
+************************************************************
+
+No buffer or inverter has been removed.
+Information: The run time for existing clock tree removal is 0 hr : 0 min : 0.00 sec, cpu time is 0 hr : 0 min : 0.00 sec. (CTS-104)
+************************************************************
+* CTS STEP: Clock Tree Initialization
+************************************************************
+Drc Mode Option: auto
+Information: Initializing classic cellmap without advanced rules enabled and with PDC enabled
+Information: The following app options are used in cellmap
+        place.legalize.enable_color_aware_placement : false
+        place.legalize.use_nll_query_cm : false
+        place.legalize.enable_advanced_legalizer : false
+        place.legalize.enable_prerouted_net_check : true
+        place.legalize.enable_advanced_prerouted_net_check : false
+        place.legalize.always_continue : true
+        place.legalize.limit_legality_checks : false
+        place.common.pnet_aware_density : 1.0000
+        place.common.pnet_aware_min_width : 0.0000
+        place.common.pnet_aware_layers : {}
+        place.common.use_placement_model : false
+        place.common.enable_advanced_placement_model : true
+        cts.placement.cell_spacing_rule_style : maximum
+Information: Creating classic rule checker.
+Warning: Routing direction of metal layer POLY2 is neither "horizontal" nor "vertical".  PDC checks will not be performed on this layer. (PDC-003)
+PDC app_options settings =========
+	place.legalize.enable_prerouted_net_check: 1
+	place.legalize.num_tracks_for_access_check: 1
+	place.legalize.use_eol_spacing_for_access_check: 0
+	place.legalize.allow_touch_track_for_access_check: 1
+	place.legalize.reduce_conservatism_in_eol_check: 0
+	place.legalize.preroute_shape_merge_distance: 0.0
+	place.legalize.enable_non_preferred_direction_span_check: 0
+
+Layer METAL1: cached 0 shapes out of 0 total shapes.
+Layer METAL2: cached 0 shapes out of 0 total shapes.
+Cached 0 vias out of 0 total vias.
+Total 0.0306 seconds to build cellmap data
+INFO: creating 12(r) x 12(c) GridCells YDim 16.8 XDim 16.8
+INFO: number of GridCells (alu_wrapper): 144
+INFO: creating 12(r) x 12(c) GridCells YDim 16.8 XDim 16.8
+INFO: number of GridCells (alu_wrapper): 144
+Total 0.0299 seconds to load 1088 cell instances into cellmap
+Moveable cells: 1088; Application fixed cells: 0; Macro cells: 0; User fixed cells: 0
+Average cell width 6.0393, cell height 3.3600, cell area 20.2919 for total 1088 placed and application fixed cells
+Information: Legalizer's PDC rule check is enabled
+Information: Legalizer's advanced rule check is enabled
+Corner Scaling is off, multiplier is 1.000000
+Automatic Zbuf-CTS Mode: total_powerInformation: Running Max-CTS
+
+Start Auto-Exception Derivations...
+ No internal pin was found.
+ No conflict pin was found.
+ No macro pin was found for clock balance point settings.
+ No macro pin was found for disabling self arcs.
+ No pin with both self arc and through arc was found for disabling self arcs.
+Info: 156 sinks and boundary insts are collected
+Information: The run time for clock tree initialization is 0 hr : 0 min : 0.09 sec, cpu time is 0 hr : 0 min : 0.09 sec. (CTS-104)
+Target skew for clocks, modes and corners:
+Drc Mode Option: auto
+Corner Scaling is off, multiplier is 1.000000
+Automatic Zbuf-CTS Mode: total_powerInformation: Running Max-CTS
+Warning: no valid parasitic for typical corner(LATE) (NEX-018)
+Warning: no valid parasitic for typical corner(EARLY) (NEX-018)
+Warning: no valid parasitic for (all corners) corner((both specs)) (NEX-018)
+Enable multi-thread Tasks, number of thread is 1
+Info: run cts with the following settings: _runCts 1 _runCto 1 _runSnapClockSinks 1
+Information: The stitching and editing of coupling caps is turned OFF for design 'alu_wrapper_lib.ndm:alu_wrapper.design'. (TIM-125)
+Warning: The extractor can not be initialized for block 'alu_wrapper'. (TIM-103)
+Warning: The extractor can not be initialized for design 'alu_wrapper'. Zero interconnect delay is used in timing analysis. (TIM-102)
+Warning: Batch extraction is skipped for block "alu_wrapper"
+Information: Update timing completed net estimation for all the timing graph nets (TIM-111)
+Information: Net estimation statistics: timing graph nets = 1136, routed nets = 0, across physical hierarchy nets = 0, parasitics cached nets = 0, delay annotated nets = 0, parasitics annotated nets = 0, multi-voltage nets = 0. (TIM-112)
+************************************************************
+* CTS STEP: Clock Cell Relocation
+************************************************************
+Warning: no valid parasitic for typical corner(LATE) (NEX-018)
+Warning: no valid parasitic for typical corner(EARLY) (NEX-018)
+Warning: no valid parasitic for (all corners) corner((both specs)) (NEX-018)
+Warning: no valid parasitic for typical corner(LATE) (NEX-018)
+Warning: no valid parasitic for typical corner(EARLY) (NEX-018)
+Warning: no valid parasitic for (all corners) corner((both specs)) (NEX-018)
+Skipping Banal latency estimation due to missing parasitics
+A total of 0 clock cells have been relocated
+Information: The run time for clock cell relocation is 0 hr : 0 min : 0.00 sec, cpu time is 0 hr : 0 min : 0.00 sec. (CTS-104)
+Information: The run time for netlink placement is 0 hr : 0 min : 0.00 sec, cpu time is 0 hr : 0 min : 0.00 sec. (CTS-104)
+************************************************************
+* CTS STEP: Gate-By-Gate Clock Tree Synthesis
+************************************************************
+Design rule constraints:
+     max fanout  = 1000000
+Computing criticality for all echelons
+Warning: no valid parasitic for typical corner(LATE) (NEX-018)
+Warning: no valid parasitic for typical corner(EARLY) (NEX-018)
+Warning: no valid parasitic for (all corners) corner((both specs)) (NEX-018)
+Warning: no valid parasitic for typical corner(LATE) (NEX-018)
+Warning: no valid parasitic for typical corner(EARLY) (NEX-018)
+Warning: no valid parasitic for (all corners) corner((both specs)) (NEX-018)
+Skipping latency estimation due to missing parasitics
+Num of echelons 1
+  Level 0 Num Nodes: 1
+Processing Echelon 1
+Processing parameter set (max_tran 0.500000 max_cap 0.600000)
+Corner typical has no valid parasitics. Ignoring
+Warning: no valid parasitic for typical corner(LATE) (NEX-018)
+Warning: no valid parasitic for typical corner(LATE) (NEX-018)
+Warning: No default voltage defined in the design, taking it as zero for power calculations. (POW-080)
+Warning: No default voltage defined in the design, taking it as zero for power calculations. (POW-080)
+Warning: No default voltage defined in the design, taking it as zero for power calculations. (POW-080)
+Warning: No default voltage defined in the design, taking it as zero for power calculations. (POW-080)
+Warning: No default voltage defined in the design, taking it as zero for power calculations. (POW-080)
+Warning: No default voltage defined in the design, taking it as zero for power calculations. (POW-080)
+Warning: No default voltage defined in the design, taking it as zero for power calculations. (POW-080)
+Warning: No default voltage defined in the design, taking it as zero for power calculations. (POW-080)
+Warning: No default voltage defined in the design, taking it as zero for power calculations. (POW-080)
+Warning: No default voltage defined in the design, taking it as zero for power calculations. (POW-080)
+Note - message 'POW-080' limit (10) exceeded. Remainder will be suppressed.
+Information: timingScenario CTS_DRC_OFF_SCEN0 timingCorner typical.  Using corner typical for worst leakage corner. Using corner typical for worst dynamic corner. (OPT-078)
+Information: Nominal = 1.1520967  Design MT = 0.475000  Target = 2.3042805  MaxRC = 1.225220 Fast Target = 1.497924 (OPT-081)
+Using layer METAL4 for buffering distances in roi (originally METAL4)
+bmap: stepx = stepy = 168000
+creating bmap
+DB units per micron : 10000
+Core Area = 12 X 12 ()
+Running regular buffering flow.
+Number of Drivers Sized: 0 [0.00%]
+
+-------------------------------------------------------------
+ Echelon 1 gate by gate clock synthesis
+ Gate level 1 clock tree synthesis
+ Driving pin = clk  (96.200, 0.217)
+ Clocks: 
+     clk (func)
+ Design rule constraints:
+     max transition = 0.500000
+     max capacitance = 0.600000
+ Number of Sinks = 156
+ Number of Gates = 0
+ Number of Loads = 156
+ Added 0 Repeaters (B: 0 I: 0). Built 0 Repeater Levels for driver clk
+ Phase delay: (max r/f: 0.000000/nan  min r/f: 0.000000/nan) : clk
+Information: The run time for gate-by-gate clock tree synthesis is 0 hr : 0 min : 0.26 sec, cpu time is 0 hr : 0 min : 0.26 sec. (CTS-104)
+************************************************************
+* CTS STEP: Latency Bottleneck Analysis
+************************************************************
+The longest paths are reported for the primary corner.
+
+Information: Latency Bottleneck Path for clock 'clk' and skew group 'default' in mode 'func' for clock root 'clk': (CTS-141)
+(1) clk [Location: (96.20, 0.22)] [Pre-CTS Fanout: 156]
+ (2) R_431/CK [Location: (158.91, 184.86)] [SINK PIN]
+
+Information: The run time for Latency Bottleneck Analysis is 0 hr : 0 min : 0.00 sec, cpu time is 0 hr : 0 min : 0.00 sec. (CTS-104)
+************************************************************
+* CTS STEP: DRC Fixing Beyond Exceptions
+************************************************************
+Warning: no valid parasitic for typical corner(LATE) (NEX-018)
+Warning: no valid parasitic for typical corner(EARLY) (NEX-018)
+Warning: no valid parasitic for (all corners) corner((both specs)) (NEX-018)
+Warning: no valid parasitic for typical corner(LATE) (NEX-018)
+Warning: no valid parasitic for typical corner(EARLY) (NEX-018)
+Warning: no valid parasitic for (all corners) corner((both specs)) (NEX-018)
+Skipping Banal latency estimation due to missing parasitics
+Design rule constraints:
+     max fanout  = 1000000
+Num of echelons 0
+Information: The run time for DRC fixing beyond exceptions is 0 hr : 0 min : 0.02 sec, cpu time is 0 hr : 0 min : 0.02 sec. (CTS-104)
+************************************************************
+* CTS STEP: Transition Histogram
+************************************************************
+============================================================
+  Transition Histogram Report
+============================================================
+Histograms are reported for the primary corner: typical
+
+  Clock: clk                             [Highest Sink Count, Highest Frequency]
+  Max Transition Constraint: 0.5000
+  ----------------------------------------------------------
+  [Sink Pins Only]  Pins: 156
+    All transitions equal: 0.000000
+  ----------------------------------------------------------
+  [All Load Pins]  Pins: 156
+    All transitions equal: 0.000000
+============================================================
+Information: The run time for Transition histogram is 0 hr : 0 min : 0.00 sec, cpu time is 0 hr : 0 min : 0.00 sec. (CTS-104)
+There are 0 buffers and 0 inverters added (total area 0.00) by Clock Tree Synthesis.
+Information: 0 out of 0 clock cells have been moved due to NDR or via ladder related legalization rules.
+Info: Clock cell and register co-legalization is disabled since advanced legalizer is disabled.
+==============================Displacement Report for clock sink==============================
+Clock sink moved: 0 out of 156, orientation changed without moving: 0
+Clock sink displacement max = 0.000000 um, average = 0.000000 um
+Clock sink with large displacement: 0 (Threshold: 10.080000 um)
+==============================================================================================
+Information: The run time for snapping registers is 0 hr : 0 min : 0.01 sec, cpu time is 0 hr : 0 min : 0.01 sec. (CTS-104)
+************************************************************
+* CTS STEP: Clock Net Global Routing
+************************************************************
+NEX(Warning): extract.rc_techfile_for_diode_mode_26_thickness not set, will igonre it
+Cut layer CNT has invalid minimum width specified
+Cell Min-Routing-Layer = METAL1
+Cell Max-Routing-Layer = METAL5
+Turn off antenna since no rule is specified
+Information: Option route.detail.force_end_on_preferred_grid will be ignored since none of the layers have preferred grid. (ZRT-703)
+Warning: Cannot find a default contact code for layer CNT. (ZRT-022)
+Warning: Port VDD of cell alu_wrapper is unplaced.  This may impact routing result. (ZRT-740)
+Warning: Port VSS of cell alu_wrapper is unplaced.  This may impact routing result. (ZRT-740)
+Warning: Ignore 2 top cell ports with no pins. (ZRT-027)
+Info: number of net_type_blockage: 0 
+Information: Via ladder engine would be activated for pattern must join connection in certain commands. Please refer to man-page for the command list. (ZRT-619)
+Via on layer (VIA4) needs more than one tracks
+Warning: Layer METAL4 default pitch 0.480 may be too small to handle up/down via. Note, that minimum requirements are "wire/via-down 0.480" & "wire/via-up 0.520". (ZRT-026)
+Information: When applicable Min-max layer allow_pin_connection mode will allow paths of length 5.38 outside the layer range. (ZRT-707)
+Information: When applicable Min-max layer allow_pin_connection mode will allow paths of length 5.38 outside the layer range on clock nets. (ZRT-718)
+Information: When applicable layer based tapering will taper up to 0.00 in distance from the pin. (ZRT-706)
+Performing initial clock net global routing ...
+Total number of global routed clock nets: 1
+Information: The run time for clock net global routing is 0 hr : 0 min : 0.42 sec, cpu time is 0 hr : 0 min : 0.42 sec. (CTS-104)
+Warning: no valid parasitic for typical corner(LATE) (NEX-018)
+Warning: no valid parasitic for typical corner(EARLY) (NEX-018)
+Warning: no valid parasitic for (all corners) corner((both specs)) (NEX-018)
+Information: The stitching and editing of coupling caps is turned OFF for design 'alu_wrapper_lib.ndm:alu_wrapper.design'. (TIM-125)
+Warning: The extractor can not be initialized for block 'alu_wrapper'. (TIM-103)
+Warning: The extractor can not be initialized for design 'alu_wrapper'. Zero interconnect delay is used in timing analysis. (TIM-102)
+Warning: Batch extraction is skipped for block "alu_wrapper"
+Information: Update timing completed net estimation for all the timing graph nets (TIM-111)
+Information: Net estimation statistics: timing graph nets = 1136, routed nets = 0, across physical hierarchy nets = 0, parasitics cached nets = 0, delay annotated nets = 0, parasitics annotated nets = 0, multi-voltage nets = 0. (TIM-112)
+Information: The netlist change observers are disabled for incremental timing updates. (TIM-119)
+Information: The netlist change observers are disabled for incremental extraction. (TIM-126)
+CTSSC route status detected: clock (VR 0, GR 305, DR 0), data (VR 1135, GR 0, DR 0); stage = auto, isPostRoute = FALSE
+Information: 'typical' is identified as primary corner for initial clock tree building. (CTS-103)
+Warning: no valid parasitic for typical corner(LATE) (NEX-018)
+Warning: no valid parasitic for typical corner(EARLY) (NEX-018)
+Warning: no valid parasitic for (all corners) corner((both specs)) (NEX-018)
+Warning: no valid parasitic for (all corners) corner((both specs)) (NEX-018)
+Error: This design has zero interconnect delay. Skip GRE initialization.
+Clock: clk, Mode: func, Root: clk
+Information: CTS QoR Pre Incremental Route: GlobalSkew = 0.0000; ID = 0.0000; NetsWithDRC = 0; Worst Tran/Cap cost = 0.0000/0.0000; ClockBufCount = 0; ClockBufArea = 0.0000; ClockCellArea = 0.0000; ClockWireLen = 1713.7740; Clock = clk; Mode = func; Corner = typical; ClockRoot = clk. (CTS-037)
+Information: The netlist change observers are enabled for incremental timing updates. (TIM-120)
+Information: The netlist change observers are enabled for incremental extraction. (TIM-127)
+Cut layer CNT has invalid minimum width specified
+Cell Min-Routing-Layer = METAL1
+Cell Max-Routing-Layer = METAL5
+Turn off antenna since no rule is specified
+Information: Option route.detail.force_end_on_preferred_grid will be ignored since none of the layers have preferred grid. (ZRT-703)
+Warning: Cannot find a default contact code for layer CNT. (ZRT-022)
+Warning: Port VDD of cell alu_wrapper is unplaced.  This may impact routing result. (ZRT-740)
+Warning: Port VSS of cell alu_wrapper is unplaced.  This may impact routing result. (ZRT-740)
+Warning: Ignore 2 top cell ports with no pins. (ZRT-027)
+Info: number of net_type_blockage: 0 
+Information: Via ladder engine would be activated for pattern must join connection in certain commands. Please refer to man-page for the command list. (ZRT-619)
+Via on layer (VIA4) needs more than one tracks
+Warning: Layer METAL4 default pitch 0.480 may be too small to handle up/down via. Note, that minimum requirements are "wire/via-down 0.480" & "wire/via-up 0.520". (ZRT-026)
+Information: When applicable Min-max layer allow_pin_connection mode will allow paths of length 5.38 outside the layer range. (ZRT-707)
+Information: When applicable Min-max layer allow_pin_connection mode will allow paths of length 5.38 outside the layer range on clock nets. (ZRT-718)
+Information: When applicable layer based tapering will taper up to 0.00 in distance from the pin. (ZRT-706)
+Start Global Route ... 
+[Init] Elapsed real time: 0:00:00 
+[Init] Elapsed cpu  time: sys=0:00:00 usr=0:00:00 total=0:00:00
+[Init] Stage (MB): Used    0  Alloctr    0  Proc    0 
+[Init] Total (MB): Used    0  Alloctr    0  Proc 8075 
+Printing options for 'route.common.*'
+common.verbose_level                                    :	 0                   
+
+Printing options for 'route.global.*'
+
+Begin global routing.
+Constructing data structure ...
+Design statistics:
+Design Bounding Box (0.00um,0.00um,193.84um,191.44um)
+Number of routing layers = 5
+layer METAL1, dir Hor, min width = 0.196um, min space = 0.2um pitch = 0.48um
+layer METAL2, dir Ver, min width = 0.24um, min space = 0.24um pitch = 0.48um
+layer METAL3, dir Hor, min width = 0.24um, min space = 0.24um pitch = 0.48um
+layer METAL4, dir Ver, min width = 0.24um, min space = 0.24um pitch = 0.48um
+layer METAL5, dir Hor, min width = 0.37um, min space = 0.4um pitch = 0.77um
+Current Stage stats:
+[End of Build Tech Data] Elapsed real time: 0:00:00 
+[End of Build Tech Data] Elapsed cpu  time: sys=0:00:00 usr=0:00:00 total=0:00:00
+[End of Build Tech Data] Stage (MB): Used    0  Alloctr    0  Proc    0 
+[End of Build Tech Data] Total (MB): Used    0  Alloctr    0  Proc 8075 
+Net statistics:
+Total number of nets     = 1138
+Number of nets to route  = 1
+1135 open nets
+ of which 1135 are without routing or PSV shapes
+3 nets are fully connected,
+ of which 2 are detail routed and 1 are global routed.
+Current Stage stats:
+[End of Build All Nets] Elapsed real time: 0:00:00 
+[End of Build All Nets] Elapsed cpu  time: sys=0:00:00 usr=0:00:00 total=0:00:00
+[End of Build All Nets] Stage (MB): Used    0  Alloctr    0  Proc    0 
+[End of Build All Nets] Total (MB): Used    0  Alloctr    0  Proc 8075 
+Net length statistics: 
+Net Count(Ignore Fully Rted) 0, Total Half Perimeter Wire Length (HPWL) 0 microns
+HPWL   0 ~   50 microns: Net Count        0	Total HPWL            0 microns
+HPWL  50 ~  100 microns: Net Count        0	Total HPWL            0 microns
+HPWL 100 ~  200 microns: Net Count        0	Total HPWL            0 microns
+HPWL 200 ~  300 microns: Net Count        0	Total HPWL            0 microns
+HPWL 300 ~  400 microns: Net Count        0	Total HPWL            0 microns
+HPWL 400 ~  500 microns: Net Count        0	Total HPWL            0 microns
+HPWL 500 ~  600 microns: Net Count        0	Total HPWL            0 microns
+HPWL 600 ~  700 microns: Net Count        0	Total HPWL            0 microns
+HPWL 700 ~  800 microns: Net Count        0	Total HPWL            0 microns
+HPWL 800 ~  900 microns: Net Count        0	Total HPWL            0 microns
+HPWL 900 ~ 1000 microns: Net Count        0	Total HPWL            0 microns
+HPWL     > 1000 microns: Net Count        0	Total HPWL            0 microns
+Number of partitions: 1 (1 x 1)
+Size of partitions: 57 gCells x 56 gCells
+Average gCell capacity  1.71	 on layer (1)	 METAL1
+Average gCell capacity  7.04	 on layer (2)	 METAL2
+Average gCell capacity  7.08	 on layer (3)	 METAL3
+Average gCell capacity  7.05	 on layer (4)	 METAL4
+Average gCell capacity  4.41	 on layer (5)	 METAL5
+Average number of tracks per gCell 7.14	 on layer (1)	 METAL1
+Average number of tracks per gCell 7.11	 on layer (2)	 METAL2
+Average number of tracks per gCell 7.14	 on layer (3)	 METAL3
+Average number of tracks per gCell 7.11	 on layer (4)	 METAL4
+Average number of tracks per gCell 4.46	 on layer (5)	 METAL5
+Number of gCells = 15960
+Current Stage stats:
+[End of Build Congestion Map] Elapsed real time: 0:00:00 
+[End of Build Congestion Map] Elapsed cpu  time: sys=0:00:00 usr=0:00:00 total=0:00:00
+[End of Build Congestion Map] Stage (MB): Used    0  Alloctr    0  Proc    0 
+[End of Build Congestion Map] Total (MB): Used    0  Alloctr    0  Proc 8075 
+Current Stage stats:
+[End of Add Nets Demand] Elapsed real time: 0:00:00 
+[End of Add Nets Demand] Elapsed cpu  time: sys=0:00:00 usr=0:00:00 total=0:00:00
+[End of Add Nets Demand] Stage (MB): Used    0  Alloctr    0  Proc    0 
+[End of Add Nets Demand] Total (MB): Used    0  Alloctr    0  Proc 8075 
+Number of user frozen nets = 0
+Total stats:
+[End of Build Data] Elapsed real time: 0:00:00 
+[End of Build Data] Elapsed cpu  time: sys=0:00:00 usr=0:00:00 total=0:00:00
+[End of Build Data] Stage (MB): Used    0  Alloctr    0  Proc    0 
+[End of Build Data] Total (MB): Used    0  Alloctr    0  Proc 8075 
+Current Stage stats:
+[End of Blocked Pin Detection] Elapsed real time: 0:00:00 
+[End of Blocked Pin Detection] Elapsed cpu  time: sys=0:00:00 usr=0:00:00 total=0:00:00
+[End of Blocked Pin Detection] Stage (MB): Used    0  Alloctr    0  Proc    0 
+[End of Blocked Pin Detection] Total (MB): Used    0  Alloctr    0  Proc 8075 
+Information: Using 1 threads for routing. (ZRT-444)
+Information: Multiple gcell levels ON
+Information: Buffer distance is estimated to be ~5000.0000um (1488 gCells)
+
+Start GR phase 0
+Number of partitions: 1 (1 x 1)
+Size of partitions: 57 gCells x 56 gCells
+[rtAllBotParts] Elapsed real time: 0:00:00 
+[rtAllBotParts] Elapsed cpu  time: sys=0:00:00 usr=0:00:00 total=0:00:00
+[rtTop] Elapsed real time: 0:00:00 
+[rtTop] Elapsed cpu  time: sys=0:00:00 usr=0:00:00 total=0:00:00
+Current Stage stats:
+[End of Initial Routing] Elapsed real time: 0:00:00 
+[End of Initial Routing] Elapsed cpu  time: sys=0:00:00 usr=0:00:00 total=0:00:00
+[End of Initial Routing] Stage (MB): Used    0  Alloctr    0  Proc    0 
+[End of Initial Routing] Total (MB): Used    0  Alloctr    0  Proc 8075 
+Initial. Routing result:
+Initial. Both Dirs: Dmd-Cap  =     0 Max = 0 GRCs =     0 (0.00%)
+Initial. H routing: Dmd-Cap  =     0 Max = 0 (GRCs =  0) GRCs =     0 (0.00%)
+Initial. V routing: Dmd-Cap  =     0 Max = 0 (GRCs =  0) GRCs =     0 (0.00%)
+Initial. Both Dirs: Overflow =     0 Max = 0 GRCs =     0 (0.00%)
+Initial. H routing: Overflow =     0 Max = 0 (GRCs =  0) GRCs =     0 (0.00%)
+Initial. V routing: Overflow =     0 Max = 0 (GRCs =  0) GRCs =     0 (0.00%)
+Initial. METAL1     Overflow =     0 Max = 0 (GRCs =  0) GRCs =     0 (0.00%)
+Initial. METAL2     Overflow =     0 Max = 0 (GRCs =  0) GRCs =     0 (0.00%)
+Initial. METAL3     Overflow =     0 Max = 0 (GRCs =  0) GRCs =     0 (0.00%)
+Initial. METAL4     Overflow =     0 Max = 0 (GRCs =  0) GRCs =     0 (0.00%)
+Initial. METAL5     Overflow =     0 Max = 0 (GRCs =  0) GRCs =     0 (0.00%)
+
+Initial. Total Wire Length = 1670.17
+Initial. Layer METAL1 wire length = 0.00
+Initial. Layer METAL2 wire length = 0.00
+Initial. Layer METAL3 wire length = 770.20
+Initial. Layer METAL4 wire length = 899.98
+Initial. Layer METAL5 wire length = 0.00
+Initial. Total Number of Contacts = 506
+Initial. Via V12_X_V1S1E11 count = 156
+Initial. Via V23_X_V1S1E11 count = 157
+Initial. Via V34_X_V1S1E11 count = 193
+Initial. Via V45_X_V1S1E11 count = 0
+Initial. completed.
+[End of Whole Chip Routing] Elapsed real time: 0:00:00 
+[End of Whole Chip Routing] Elapsed cpu  time: sys=0:00:00 usr=0:00:00 total=0:00:00
+[End of Whole Chip Routing] Stage (MB): Used    0  Alloctr    0  Proc    0 
+[End of Whole Chip Routing] Total (MB): Used    0  Alloctr    0  Proc 8075 
+
+Congestion utilization per direction:
+Average vertical track utilization   =  1.11 %
+Peak    vertical track utilization   = 14.29 %
+Average horizontal track utilization =  0.90 %
+Peak    horizontal track utilization =  9.09 %
+
+[End of Global Routing] Elapsed real time: 0:00:00 
+[End of Global Routing] Elapsed cpu  time: sys=0:00:00 usr=0:00:00 total=0:00:00
+[End of Global Routing] Stage (MB): Used    0  Alloctr    0  Proc    0 
+[End of Global Routing] Total (MB): Used    0  Alloctr    0  Proc 8075 
+Total number of open nets = 0, of which 0 are frozen
+Updating congestion ...
+Updating congestion ...
+[End of dbOut] Elapsed real time: 0:00:00 
+[End of dbOut] Elapsed cpu  time: sys=0:00:00 usr=0:00:00 total=0:00:00
+[End of dbOut] Stage (MB): Used    0  Alloctr    0  Proc    0 
+[End of dbOut] Total (MB): Used    0  Alloctr    0  Proc 8075 
+Information: Maximum hot spot size per layer
+	METAL4	0
+	METAL5	0
+Maximum hot spot size is 0 
+CONG_HS metric is 0.000 
+
+Skip track assign
+Skip detail route
+Updating the database ...
+Warning: no valid parasitic for typical corner(LATE) (NEX-018)
+Warning: no valid parasitic for typical corner(EARLY) (NEX-018)
+Warning: no valid parasitic for (all corners) corner((both specs)) (NEX-018)
+Information: The stitching and editing of coupling caps is turned OFF for design 'alu_wrapper_lib.ndm:alu_wrapper.design'. (TIM-125)
+Warning: The extractor can not be initialized for block 'alu_wrapper'. (TIM-103)
+Warning: The extractor can not be initialized for design 'alu_wrapper'. Zero interconnect delay is used in timing analysis. (TIM-102)
+Warning: Batch extraction is skipped for block "alu_wrapper"
+Information: Update timing completed net estimation for all the timing graph nets (TIM-111)
+Information: Net estimation statistics: timing graph nets = 1136, routed nets = 0, across physical hierarchy nets = 0, parasitics cached nets = 0, delay annotated nets = 0, parasitics annotated nets = 0, multi-voltage nets = 0. (TIM-112)
+Clock: clk, Mode: func, Root: clk
+Information: CTS QoR Post Incremental Route: GlobalSkew = 0.0000; ID = 0.0000; NetsWithDRC = 0; Worst Tran/Cap cost = 0.0000/0.0000; ClockBufCount = 0; ClockBufArea = 0.0000; ClockCellArea = 0.0000; ClockWireLen = 1713.7740; Clock = clk; Mode = func; Corner = typical; ClockRoot = clk. (CTS-037)
+ Run time for cts 00:00:01.08u 00:00:00.03s 00:00:01.12e: 
+Information: Ending   'synthesize_clock_trees' (FLW-8001)
+Information: Time: 2026-10-26 15:33:40 / Session:  00:01:28 / Command:  00:00:01 / CPU:  00:00:01 / Memory: 845 MB (FLW-8100)
+Information: Starting 'legalize_placement' (FLW-8000)
+Information: Time: 2026-10-26 15:33:40 / Session:  00:01:28 / Command:  00:00:00 / CPU:  00:00:00 / Memory: 845 MB (FLW-8100)
+nplDplc2Placer::setParam(effort,1)
+nplDplc2Placer::setParam(debug,0)
+nplDplc2Placer::setParam(site_check,2)
+nplDplc2Placer::setParam(app_firm_wgt,0)
+Warning: Routing direction of metal layer POLY2 is neither "horizontal" nor "vertical".  PDC checks will not be performed on this layer. (PDC-003)
+PDC app_options settings =========
+	place.legalize.enable_prerouted_net_check: 1
+	place.legalize.num_tracks_for_access_check: 1
+	place.legalize.use_eol_spacing_for_access_check: 0
+	place.legalize.allow_touch_track_for_access_check: 1
+	place.legalize.reduce_conservatism_in_eol_check: 0
+	place.legalize.preroute_shape_merge_distance: 0.0
+	place.legalize.enable_non_preferred_direction_span_check: 0
+
+Layer METAL1: cached 0 shapes out of 45 total shapes.
+Layer METAL2: cached 0 shapes out of 0 total shapes.
+Cached 0 vias out of 506 total vias.
+
+Legalizing Top Level Design alu_wrapper ... 
+Information: Initializing classic cellmap without advanced rules enabled and without PDC enabled
+Information: The following app options are used in cellmap
+        place.legalize.enable_color_aware_placement : false
+        place.legalize.use_nll_query_cm : false
+        place.legalize.enable_advanced_legalizer : false
+        place.legalize.enable_prerouted_net_check : true
+        place.legalize.enable_advanced_prerouted_net_check : false
+        place.legalize.always_continue : true
+        place.legalize.limit_legality_checks : false
+        place.common.pnet_aware_density : 1.0000
+        place.common.pnet_aware_min_width : 0.0000
+        place.common.pnet_aware_layers : {}
+        place.common.use_placement_model : false
+        place.common.enable_advanced_placement_model : true
+        cts.placement.cell_spacing_rule_style : maximum
+Total 0.0201 seconds to build cellmap data
+Information: Creating classic rule checker.
+Warning: Routing direction of metal layer POLY2 is neither "horizontal" nor "vertical".  PDC checks will not be performed on this layer. (PDC-003)
+=====> Processed 61 ref cells (0 fillers) from library
+
+Bounds/Regions In This Design:
+        Area    Num Cells  Exclusive Name
+ (square um)
+     33355.9         1088        Yes DEFAULT_VA
+
+Starting legalizer.
+Warning: Exclusive bound 'DEFAULT' has no cells.
+Optimizing Exclusive Bound 'DEFAULT_VA' (2/2)
+    Done Exclusive Bound 'DEFAULT_VA' (2/2) (0 sec)
+Legalization complete (0 total sec)
+
+****************************************
+  Report : Placement Attempts
+  Site   : unit
+****************************************
+
+number of cells:                   1088
+number of references:                61
+number of site rows:                 54
+number of locations attempted:    15863
+number of locations failed:           0  (0.0%)
+
+Legality of references at locations:
+0 references had failures.
+
+Legality of references in rows:
+0 references had row failures.
+
+****************************************
+  Report : Cell Displacements
+****************************************
+
+number of cells aggregated:        1088 (13689 total sites)
+avg row height over cells:        3.360 um
+rms cell displacement:            0.000 um ( 0.00 row height)
+rms weighted cell displacement:   0.000 um ( 0.00 row height)
+max cell displacement:            0.000 um ( 0.00 row height)
+avg cell displacement:            0.000 um ( 0.00 row height)
+avg weighted cell displacement:   0.000 um ( 0.00 row height)
+number of cells moved:                0
+number of large displacements:        0
+large displacement threshold:     3.000 row height
+
+Displacements of worst 10 cells:
+Cell: U935 (AOI12X1TAS7)
+  Input location: (17,183.08)
+  Legal location: (17,183.08)
+  Displacement:   0.000 um ( 0.00 row height)
+Cell: U757 (AOI12X1TAS7)
+  Input location: (103.4,173)
+  Legal location: (103.4,173)
+  Displacement:   0.000 um ( 0.00 row height)
+Cell: U587 (AOI12X1TAS7)
+  Input location: (179.72,52.04)
+  Legal location: (179.72,52.04)
+  Displacement:   0.000 um ( 0.00 row height)
+Cell: U433 (AOI12X1TAS7)
+  Input location: (178.76,149.48)
+  Legal location: (178.76,149.48)
+  Displacement:   0.000 um ( 0.00 row height)
+Cell: U590 (AND4X1TAS7)
+  Input location: (51.56,72.2)
+  Legal location: (51.56,72.2)
+  Displacement:   0.000 um ( 0.00 row height)
+Cell: U237 (AOI12X1TAS7)
+  Input location: (21.8,35.24)
+  Legal location: (21.8,35.24)
+  Displacement:   0.000 um ( 0.00 row height)
+Cell: U785 (AOI12B2X1TAS7)
+  Input location: (29.96,173)
+  Legal location: (29.96,173)
+  Displacement:   0.000 um ( 0.00 row height)
+Cell: U602 (AOI12B2X1TAS7)
+  Input location: (48.2,78.92)
+  Legal location: (48.2,78.92)
+  Displacement:   0.000 um ( 0.00 row height)
+Cell: U314 (AOI12B2X1TAS7)
+  Input location: (100.04,176.36)
+  Legal location: (100.04,176.36)
+  Displacement:   0.000 um ( 0.00 row height)
+Cell: U942 (AOI12X1TAS7)
+  Input location: (15.56,176.36)
+  Legal location: (15.56,176.36)
+  Displacement:   0.000 um ( 0.00 row height)
+
+Legalization succeeded.
+Total Legalizer CPU: 0.123
+Total Legalizer Wall Time: 0.123
+----------------------------------------------------------------
+Information: Ending   'legalize_placement' (FLW-8001)
+Information: Time: 2026-10-26 15:33:40 / Session:  00:01:28 / Command:  00:00:00 / CPU:  00:00:00 / Memory: 845 MB (FLW-8100)
+0
+conectar_pg
+Information: Connecting to PG and tie pins in automatic mode. (MV-396)
+****************************************
+Report : Power/Ground Connection Summary
+Design : alu_wrapper
+Version: Y-2026.03-SP2
+Date   : Mon Oct 26 15:33:41 2026
+****************************************
+P/G net name                  P/G pin count(previous/current)
+--------------------------------------------------------------------------------
+Power net VDD                 1088/1088
+Ground net VSS                1088/1088
+--------------------------------------------------------------------------------
+Information: connections of 0 power/ground pin(s) are created or changed. (MV-382)
+
+0
+report_timing > reports/icc2_2_clock_opt_timing.rpt
+if {[catch {route_auto} err_route]} { catch {route_global}; catch {route_track}; catch {route_detail} }
+Warning: Please run the command "check_routability" before running Zroute commands. (ZRT-762)
+Information: The command 'route_auto' cleared the undo history. (UNDO-016)
+Information: Starting 'route_auto' (FLW-8000)
+Information: Time: 2026-10-26 15:33:41 / Session:  00:01:29 / Command:  00:00:00 / CPU:  00:00:00 / Memory: 845 MB (FLW-8100)
+Warning: max_routing_layer is not set in the design.
+Cut layer CNT has invalid minimum width specified
+Cell Min-Routing-Layer = METAL1
+Cell Max-Routing-Layer = METAL5
+Turn off antenna since no rule is specified
+Information: Option route.detail.force_end_on_preferred_grid will be ignored since none of the layers have preferred grid. (ZRT-703)
+Warning: Cannot find a default contact code for layer CNT. (ZRT-022)
+Warning: Port VDD of cell alu_wrapper is unplaced.  This may impact routing result. (ZRT-740)
+Warning: Port VSS of cell alu_wrapper is unplaced.  This may impact routing result. (ZRT-740)
+Warning: Ignore 2 top cell ports with no pins. (ZRT-027)
+Info: number of net_type_blockage: 0 
+Information: Via ladder engine would be activated for pattern must join connection in certain commands. Please refer to man-page for the command list. (ZRT-619)
+Via on layer (VIA4) needs more than one tracks
+Warning: Layer METAL4 default pitch 0.480 may be too small to handle up/down via. Note, that minimum requirements are "wire/via-down 0.480" & "wire/via-up 0.520". (ZRT-026)
+Information: When applicable Min-max layer allow_pin_connection mode will allow paths of length 5.38 outside the layer range. (ZRT-707)
+Information: When applicable Min-max layer allow_pin_connection mode will allow paths of length 5.38 outside the layer range on clock nets. (ZRT-718)
+Information: When applicable layer based tapering will taper up to 0.00 in distance from the pin. (ZRT-706)
+
+    Found 0 via ladders to verify.
+
+VIA LADDER INFO: found 0 via ladder DRCs across 0 nets.
+Updating the database ...
+
+    Via ladders will be inserted on 0 of 0 ports with via ladder constraints.
+
+Updating the database ...
+[Arrange data for GR] Elapsed real time: 0:00:00 
+[Arrange data for GR] Elapsed cpu  time: sys=0:00:00 usr=0:00:00 total=0:00:00
+[Arrange data for GR] Stage (MB): Used    0  Alloctr    0  Proc    0 
+[Arrange data for GR] Total (MB): Used    0  Alloctr    0  Proc 8075 
+Start Global Route ... 
+[Init] Elapsed real time: 0:00:00 
+[Init] Elapsed cpu  time: sys=0:00:00 usr=0:00:00 total=0:00:00
+[Init] Stage (MB): Used    0  Alloctr    0  Proc    0 
+[Init] Total (MB): Used    0  Alloctr    0  Proc 8075 
+Printing options for 'route.common.*'
+common.verbose_level                                    :	 0                   
+
+Printing options for 'route.global.*'
+
+Begin global routing.
+Constructing data structure ...
+Design statistics:
+Design Bounding Box (0.00um,0.00um,193.84um,191.44um)
+Number of routing layers = 5
+layer METAL1, dir Hor, min width = 0.196um, min space = 0.2um pitch = 0.48um
+layer METAL2, dir Ver, min width = 0.24um, min space = 0.24um pitch = 0.48um
+layer METAL3, dir Hor, min width = 0.24um, min space = 0.24um pitch = 0.48um
+layer METAL4, dir Ver, min width = 0.24um, min space = 0.24um pitch = 0.48um
+layer METAL5, dir Hor, min width = 0.37um, min space = 0.4um pitch = 0.77um
+Current Stage stats:
+[End of Build Tech Data] Elapsed real time: 0:00:00 
+[End of Build Tech Data] Elapsed cpu  time: sys=0:00:00 usr=0:00:00 total=0:00:00
+[End of Build Tech Data] Stage (MB): Used    0  Alloctr    0  Proc    0 
+[End of Build Tech Data] Total (MB): Used    0  Alloctr    0  Proc 8075 
+Net statistics:
+Total number of nets     = 1138
+Number of nets to route  = 1136
+1135 open nets
+ of which 1135 are without routing or PSV shapes
+3 nets are fully connected,
+ of which 2 are detail routed and 1 are global routed.
+Information: 1 of the existing global routes are deleted. (ZRT-102)
+Current Stage stats:
+[End of Build All Nets] Elapsed real time: 0:00:00 
+[End of Build All Nets] Elapsed cpu  time: sys=0:00:00 usr=0:00:00 total=0:00:00
+[End of Build All Nets] Stage (MB): Used    0  Alloctr    0  Proc    0 
+[End of Build All Nets] Total (MB): Used    0  Alloctr    0  Proc 8075 
+Net length statistics: 
+Net Count(Ignore Fully Rted) 1136, Total Half Perimeter Wire Length (HPWL) 33856 microns
+HPWL   0 ~   50 microns: Net Count      961	Total HPWL        15029 microns
+HPWL  50 ~  100 microns: Net Count      103	Total HPWL         7054 microns
+HPWL 100 ~  200 microns: Net Count       60	Total HPWL         8527 microns
+HPWL 200 ~  300 microns: Net Count       10	Total HPWL         2538 microns
+HPWL 300 ~  400 microns: Net Count        2	Total HPWL          707 microns
+HPWL 400 ~  500 microns: Net Count        0	Total HPWL            0 microns
+HPWL 500 ~  600 microns: Net Count        0	Total HPWL            0 microns
+HPWL 600 ~  700 microns: Net Count        0	Total HPWL            0 microns
+HPWL 700 ~  800 microns: Net Count        0	Total HPWL            0 microns
+HPWL 800 ~  900 microns: Net Count        0	Total HPWL            0 microns
+HPWL 900 ~ 1000 microns: Net Count        0	Total HPWL            0 microns
+HPWL     > 1000 microns: Net Count        0	Total HPWL            0 microns
+Number of partitions: 1 (1 x 1)
+Size of partitions: 57 gCells x 56 gCells
+Average gCell capacity  1.71	 on layer (1)	 METAL1
+Average gCell capacity  7.04	 on layer (2)	 METAL2
+Average gCell capacity  7.08	 on layer (3)	 METAL3
+Average gCell capacity  7.05	 on layer (4)	 METAL4
+Average gCell capacity  4.41	 on layer (5)	 METAL5
+Average number of tracks per gCell 7.14	 on layer (1)	 METAL1
+Average number of tracks per gCell 7.11	 on layer (2)	 METAL2
+Average number of tracks per gCell 7.14	 on layer (3)	 METAL3
+Average number of tracks per gCell 7.11	 on layer (4)	 METAL4
+Average number of tracks per gCell 4.46	 on layer (5)	 METAL5
+Number of gCells = 15960
+Current Stage stats:
+[End of Build Congestion Map] Elapsed real time: 0:00:00 
+[End of Build Congestion Map] Elapsed cpu  time: sys=0:00:00 usr=0:00:00 total=0:00:00
+[End of Build Congestion Map] Stage (MB): Used    0  Alloctr    0  Proc    0 
+[End of Build Congestion Map] Total (MB): Used    0  Alloctr    0  Proc 8075 
+Current Stage stats:
+[End of Add Nets Demand] Elapsed real time: 0:00:00 
+[End of Add Nets Demand] Elapsed cpu  time: sys=0:00:00 usr=0:00:00 total=0:00:00
+[End of Add Nets Demand] Stage (MB): Used    0  Alloctr    0  Proc    0 
+[End of Add Nets Demand] Total (MB): Used    0  Alloctr    0  Proc 8075 
+Number of user frozen nets = 0
+Total stats:
+[End of Build Data] Elapsed real time: 0:00:00 
+[End of Build Data] Elapsed cpu  time: sys=0:00:00 usr=0:00:00 total=0:00:00
+[End of Build Data] Stage (MB): Used    0  Alloctr    0  Proc    0 
+[End of Build Data] Total (MB): Used    0  Alloctr    0  Proc 8075 
+Number of partitions: 1 (1 x 1)
+Size of partitions: 57 gCells x 56 gCells
+Current Stage stats:
+[End of Blocked Pin Detection] Elapsed real time: 0:00:00 
+[End of Blocked Pin Detection] Elapsed cpu  time: sys=0:00:00 usr=0:00:00 total=0:00:00
+[End of Blocked Pin Detection] Stage (MB): Used    0  Alloctr    0  Proc   54 
+[End of Blocked Pin Detection] Total (MB): Used    0  Alloctr    0  Proc 8129 
+Information: Using 1 threads for routing. (ZRT-444)
+Information: Multiple gcell levels ON
+Information: Buffer distance is estimated to be ~5000.0000um (1488 gCells)
+
+Start GR phase 0
+Number of partitions: 1 (1 x 1)
+Size of partitions: 57 gCells x 56 gCells
+[rtAllBotParts] Elapsed real time: 0:00:00 
+[rtAllBotParts] Elapsed cpu  time: sys=0:00:00 usr=0:00:00 total=0:00:00
+[rtTop] Elapsed real time: 0:00:00 
+[rtTop] Elapsed cpu  time: sys=0:00:00 usr=0:00:00 total=0:00:00
+Current Stage stats:
+[End of Initial Routing] Elapsed real time: 0:00:00 
+[End of Initial Routing] Elapsed cpu  time: sys=0:00:00 usr=0:00:00 total=0:00:00
+[End of Initial Routing] Stage (MB): Used    0  Alloctr    0  Proc    0 
+[End of Initial Routing] Total (MB): Used    0  Alloctr    0  Proc 8129 
+Initial. Routing result:
+Initial. Both Dirs: Dmd-Cap  =     0 Max = 0 GRCs =     0 (0.00%)
+Initial. H routing: Dmd-Cap  =     0 Max = 0 (GRCs =  0) GRCs =     0 (0.00%)
+Initial. V routing: Dmd-Cap  =     0 Max = 0 (GRCs =  0) GRCs =     0 (0.00%)
+Initial. Both Dirs: Overflow =    10 Max = 2 GRCs =    22 (0.34%)
+Initial. H routing: Overflow =     7 Max = 1 (GRCs = 13) GRCs =    13 (0.41%)
+Initial. V routing: Overflow =     3 Max = 2 (GRCs =  1) GRCs =     9 (0.28%)
+Initial. METAL1     Overflow =     7 Max = 1 (GRCs = 10) GRCs =    10 (0.31%)
+Initial. METAL2     Overflow =     3 Max = 2 (GRCs =  1) GRCs =     9 (0.28%)
+Initial. METAL3     Overflow =     0 Max = 1 (GRCs =  3) GRCs =     3 (0.09%)
+Initial. METAL4     Overflow =     0 Max = 0 (GRCs =  0) GRCs =     0 (0.00%)
+Initial. METAL5     Overflow =     0 Max = 0 (GRCs =  0) GRCs =     0 (0.00%)
+
+Initial. Total Wire Length = 33580.85
+Initial. Layer METAL1 wire length = 673.70
+Initial. Layer METAL2 wire length = 17038.52
+Initial. Layer METAL3 wire length = 15352.19
+Initial. Layer METAL4 wire length = 516.43
+Initial. Layer METAL5 wire length = 0.00
+Initial. Total Number of Contacts = 6237
+Initial. Via V12_X_V1S1E11 count = 3512
+Initial. Via V23_X_V1S1E11 count = 2693
+Initial. Via V34_X_V1S1E11 count = 32
+Initial. Via V45_X_V1S1E11 count = 0
+Initial. completed.
+
+Start GR phase 1
+Mon Oct 26 15:33:41 2026
+Number of partitions: 1 (1 x 1)
+Size of partitions: 57 gCells x 56 gCells
+[rtAllParts] Elapsed real time: 0:00:00 
+[rtAllParts] Elapsed cpu  time: sys=0:00:00 usr=0:00:00 total=0:00:00
+Current Stage stats:
+[End of Phase1 Routing] Elapsed real time: 0:00:00 
+[End of Phase1 Routing] Elapsed cpu  time: sys=0:00:00 usr=0:00:00 total=0:00:00
+[End of Phase1 Routing] Stage (MB): Used    0  Alloctr    0  Proc    0 
+[End of Phase1 Routing] Total (MB): Used    0  Alloctr    0  Proc 8129 
+phase1. Routing result:
+phase1. Both Dirs: Dmd-Cap  =     0 Max = 0 GRCs =     0 (0.00%)
+phase1. H routing: Dmd-Cap  =     0 Max = 0 (GRCs =  0) GRCs =     0 (0.00%)
+phase1. V routing: Dmd-Cap  =     0 Max = 0 (GRCs =  0) GRCs =     0 (0.00%)
+phase1. Both Dirs: Overflow =     6 Max = 3 GRCs =    10 (0.16%)
+phase1. H routing: Overflow =     4 Max = 1 (GRCs =  7) GRCs =     7 (0.22%)
+phase1. V routing: Overflow =     2 Max = 3 (GRCs =  1) GRCs =     3 (0.09%)
+phase1. METAL1     Overflow =     4 Max = 1 (GRCs =  7) GRCs =     7 (0.22%)
+phase1. METAL2     Overflow =     2 Max = 3 (GRCs =  1) GRCs =     3 (0.09%)
+phase1. METAL3     Overflow =     0 Max = 0 (GRCs =  0) GRCs =     0 (0.00%)
+phase1. METAL4     Overflow =     0 Max = 0 (GRCs =  0) GRCs =     0 (0.00%)
+phase1. METAL5     Overflow =     0 Max = 0 (GRCs =  0) GRCs =     0 (0.00%)
+
+phase1. Total Wire Length = 33588.33
+phase1. Layer METAL1 wire length = 668.49
+phase1. Layer METAL2 wire length = 16714.00
+phase1. Layer METAL3 wire length = 15388.24
+phase1. Layer METAL4 wire length = 817.59
+phase1. Layer METAL5 wire length = 0.00
+phase1. Total Number of Contacts = 6256
+phase1. Via V12_X_V1S1E11 count = 3510
+phase1. Via V23_X_V1S1E11 count = 2703
+phase1. Via V34_X_V1S1E11 count = 43
+phase1. Via V45_X_V1S1E11 count = 0
+phase1. completed.
+
+Start GR phase 2
+Mon Oct 26 15:33:41 2026
+Number of partitions: 1 (1 x 1)
+Size of partitions: 57 gCells x 56 gCells
+[rtAllParts] Elapsed real time: 0:00:00 
+[rtAllParts] Elapsed cpu  time: sys=0:00:00 usr=0:00:00 total=0:00:00
+[updNetsDmd] Elapsed real time: 0:00:00 
+[updNetsDmd] Elapsed cpu  time: sys=0:00:00 usr=0:00:00 total=0:00:00
+Current Stage stats:
+[End of Phase2 Routing] Elapsed real time: 0:00:00 
+[End of Phase2 Routing] Elapsed cpu  time: sys=0:00:00 usr=0:00:00 total=0:00:00
+[End of Phase2 Routing] Stage (MB): Used    0  Alloctr    0  Proc    0 
+[End of Phase2 Routing] Total (MB): Used    0  Alloctr    0  Proc 8129 
+phase2. Routing result:
+phase2. Both Dirs: Dmd-Cap  =     0 Max = 0 GRCs =     0 (0.00%)
+phase2. H routing: Dmd-Cap  =     0 Max = 0 (GRCs =  0) GRCs =     0 (0.00%)
+phase2. V routing: Dmd-Cap  =     0 Max = 0 (GRCs =  0) GRCs =     0 (0.00%)
+phase2. Both Dirs: Overflow =     3 Max = 1 GRCs =     6 (0.09%)
+phase2. H routing: Overflow =     3 Max = 1 (GRCs =  6) GRCs =     6 (0.19%)
+phase2. V routing: Overflow =     0 Max = 0 (GRCs =  0) GRCs =     0 (0.00%)
+phase2. METAL1     Overflow =     3 Max = 1 (GRCs =  6) GRCs =     6 (0.19%)
+phase2. METAL2     Overflow =     0 Max = 0 (GRCs =  0) GRCs =     0 (0.00%)
+phase2. METAL3     Overflow =     0 Max = 0 (GRCs =  0) GRCs =     0 (0.00%)
+phase2. METAL4     Overflow =     0 Max = 0 (GRCs =  0) GRCs =     0 (0.00%)
+phase2. METAL5     Overflow =     0 Max = 0 (GRCs =  0) GRCs =     0 (0.00%)
+
+phase2. Total Wire Length = 33592.57
+phase2. Layer METAL1 wire length = 664.17
+phase2. Layer METAL2 wire length = 16700.96
+phase2. Layer METAL3 wire length = 15396.40
+phase2. Layer METAL4 wire length = 831.03
+phase2. Layer METAL5 wire length = 0.00
+phase2. Total Number of Contacts = 6262
+phase2. Via V12_X_V1S1E11 count = 3509
+phase2. Via V23_X_V1S1E11 count = 2708
+phase2. Via V34_X_V1S1E11 count = 45
+phase2. Via V45_X_V1S1E11 count = 0
+phase2. completed.
+
+Start GR phase 3
+Mon Oct 26 15:33:42 2026
+Number of partitions: 1 (1 x 1)
+Size of partitions: 57 gCells x 56 gCells
+[rtAllParts] Elapsed real time: 0:00:00 
+[rtAllParts] Elapsed cpu  time: sys=0:00:00 usr=0:00:00 total=0:00:00
+[updNetsDmd] Elapsed real time: 0:00:00 
+[updNetsDmd] Elapsed cpu  time: sys=0:00:00 usr=0:00:00 total=0:00:00
+Current Stage stats:
+[End of Phase3 Routing] Elapsed real time: 0:00:00 
+[End of Phase3 Routing] Elapsed cpu  time: sys=0:00:00 usr=0:00:00 total=0:00:00
+[End of Phase3 Routing] Stage (MB): Used    0  Alloctr    0  Proc    0 
+[End of Phase3 Routing] Total (MB): Used    0  Alloctr    0  Proc 8129 
+phase3. Routing result:
+phase3. Both Dirs: Dmd-Cap  =     0 Max = 0 GRCs =     0 (0.00%)
+phase3. H routing: Dmd-Cap  =     0 Max = 0 (GRCs =  0) GRCs =     0 (0.00%)
+phase3. V routing: Dmd-Cap  =     0 Max = 0 (GRCs =  0) GRCs =     0 (0.00%)
+phase3. Both Dirs: Overflow =     3 Max = 1 GRCs =     6 (0.09%)
+phase3. H routing: Overflow =     3 Max = 1 (GRCs =  6) GRCs =     6 (0.19%)
+phase3. V routing: Overflow =     0 Max = 0 (GRCs =  0) GRCs =     0 (0.00%)
+phase3. METAL1     Overflow =     3 Max = 1 (GRCs =  6) GRCs =     6 (0.19%)
+phase3. METAL2     Overflow =     0 Max = 0 (GRCs =  0) GRCs =     0 (0.00%)
+phase3. METAL3     Overflow =     0 Max = 0 (GRCs =  0) GRCs =     0 (0.00%)
+phase3. METAL4     Overflow =     0 Max = 0 (GRCs =  0) GRCs =     0 (0.00%)
+phase3. METAL5     Overflow =     0 Max = 0 (GRCs =  0) GRCs =     0 (0.00%)
+
+phase3. Total Wire Length = 33592.57
+phase3. Layer METAL1 wire length = 664.17
+phase3. Layer METAL2 wire length = 16700.96
+phase3. Layer METAL3 wire length = 15396.40
+phase3. Layer METAL4 wire length = 831.03
+phase3. Layer METAL5 wire length = 0.00
+phase3. Total Number of Contacts = 6262
+phase3. Via V12_X_V1S1E11 count = 3509
+phase3. Via V23_X_V1S1E11 count = 2708
+phase3. Via V34_X_V1S1E11 count = 45
+phase3. Via V45_X_V1S1E11 count = 0
+phase3. completed.
+[End of Whole Chip Routing] Elapsed real time: 0:00:00 
+[End of Whole Chip Routing] Elapsed cpu  time: sys=0:00:00 usr=0:00:00 total=0:00:00
+[End of Whole Chip Routing] Stage (MB): Used    0  Alloctr    0  Proc   54 
+[End of Whole Chip Routing] Total (MB): Used    0  Alloctr    0  Proc 8129 
+
+Congestion utilization per direction:
+Average vertical track utilization   = 17.46 %
+Peak    vertical track utilization   = 64.29 %
+Average horizontal track utilization = 14.24 %
+Peak    horizontal track utilization = 54.55 %
+
+[End of Global Routing] Elapsed real time: 0:00:00 
+[End of Global Routing] Elapsed cpu  time: sys=0:00:00 usr=0:00:00 total=0:00:00
+[End of Global Routing] Stage (MB): Used    0  Alloctr    0  Proc   54 
+[End of Global Routing] Total (MB): Used    0  Alloctr    0  Proc 8129 
+Total number of open nets = 0, of which 0 are frozen
+Updating congestion ...
+Updating congestion ...
+[End of dbOut] Elapsed real time: 0:00:00 
+[End of dbOut] Elapsed cpu  time: sys=0:00:00 usr=0:00:00 total=0:00:00
+[End of dbOut] Stage (MB): Used    0  Alloctr    0  Proc    0 
+[End of dbOut] Total (MB): Used    0  Alloctr    0  Proc 8129 
+Information: Maximum hot spot size per layer
+	METAL4	0
+	METAL5	0
+Maximum hot spot size is 0 
+CONG_HS metric is 0.000 
+
+
+Start track assignment
+
+Printing options for 'route.common.*'
+common.verbose_level                                    :	 0                   
+
+Printing options for 'route.track.*'
+
+Information: Using 1 threads for routing. (ZRT-444)
+
+[Track Assign: TA init] Elapsed real time: 0:00:00 
+[Track Assign: TA init] Elapsed cpu  time: sys=0:00:00 usr=0:00:00 total=0:00:00
+[Track Assign: TA init] Stage (MB): Used    0  Alloctr    0  Proc    0 
+[Track Assign: TA init] Total (MB): Used    0  Alloctr    0  Proc 8129 
+
+Start initial assignment
+
+Assign Horizontal partitions, iteration 0 
+Routed partition 1/12       
+Routed partition 2/12       
+Routed partition 3/12       
+Routed partition 4/12       
+Routed partition 5/12       
+Routed partition 6/12       
+Routed partition 7/12       
+Routed partition 8/12       
+Routed partition 9/12       
+Routed partition 10/12      
+Routed partition 11/12      
+Routed partition 12/12      
+
+Assign Vertical partitions, iteration 0 
+Routed partition 1/12       
+Routed partition 2/12       
+Routed partition 3/12       
+Routed partition 4/12       
+Routed partition 5/12       
+Routed partition 6/12       
+Routed partition 7/12       
+Routed partition 8/12       
+Routed partition 9/12       
+Routed partition 10/12      
+Routed partition 11/12      
+Routed partition 12/12      
+
+Number of wires with overlap after iteration 0 = 4759 of 11157
+
+
+[Track Assign: Iteration 0] Elapsed real time: 0:00:00 
+[Track Assign: Iteration 0] Elapsed cpu  time: sys=0:00:00 usr=0:00:00 total=0:00:00
+[Track Assign: Iteration 0] Stage (MB): Used    0  Alloctr    0  Proc    0 
+[Track Assign: Iteration 0] Total (MB): Used    0  Alloctr    0  Proc 8129 
+
+Reroute to fix overlaps (iter = 1)
+
+Assign Horizontal partitions, iteration 1 
+Routed partition 1/12       
+Routed partition 2/12       
+Routed partition 3/12       
+Routed partition 4/12       
+Routed partition 5/12       
+Routed partition 6/12       
+Routed partition 7/12       
+Routed partition 8/12       
+Routed partition 9/12       
+Routed partition 10/12      
+Routed partition 11/12      
+Routed partition 12/12      
+
+Assign Vertical partitions, iteration 1 
+Routed partition 1/12       
+Routed partition 2/12       
+Routed partition 3/12       
+Routed partition 4/12       
+Routed partition 5/12       
+Routed partition 6/12       
+Routed partition 7/12       
+Routed partition 8/12       
+Routed partition 9/12       
+Routed partition 10/12      
+Routed partition 11/12      
+Routed partition 12/12      
+
+[Track Assign: Iteration 1] Elapsed real time: 0:00:00 
+[Track Assign: Iteration 1] Elapsed cpu  time: sys=0:00:00 usr=0:00:00 total=0:00:00
+[Track Assign: Iteration 1] Stage (MB): Used    0  Alloctr    0  Proc    0 
+[Track Assign: Iteration 1] Total (MB): Used    0  Alloctr    0  Proc 8129 
+
+Number of wires with overlap after iteration 1 = 2935 of 7915
+
+
+Wire length and via report:
+---------------------------
+Number of METAL1 wires: 2172 		  : 0
+Number of METAL2 wires: 3668 		 V12_X_V1S1E11: 3594
+Number of METAL3 wires: 2031 		 V23_X_V1S1E11: 3239
+Number of METAL4 wires: 44 		 V34_X_V1S1E11: 90
+Number of METAL5 wires: 0 		 V45_X_V1S1E11: 0
+Total number of wires: 7915 		 vias: 6923
+
+Total METAL1 wire length: 1346.5
+Total METAL2 wire length: 16637.5
+Total METAL3 wire length: 15496.2
+Total METAL4 wire length: 1133.8
+Total METAL5 wire length: 0.0
+Total wire length: 34614.0
+
+Longest METAL1 wire length: 121.9
+Longest METAL2 wire length: 105.6
+Longest METAL3 wire length: 136.3
+Longest METAL4 wire length: 100.8
+Longest METAL5 wire length: 0.0
+
+
+[Track Assign: Done] Elapsed real time: 0:00:00 
+[Track Assign: Done] Elapsed cpu  time: sys=0:00:00 usr=0:00:00 total=0:00:00
+[Track Assign: Done] Stage (MB): Used    0  Alloctr    0  Proc    0 
+[Track Assign: Done] Total (MB): Used    0  Alloctr    0  Proc 8129 
+ Info: Xtalk flow is enabled for DR ...
+Printing options for 'route.common.*'
+common.verbose_level                                    :	 0                   
+
+Printing options for 'route.detail.*'
+
+Printing options for 'route.auto_via_ladder.*'
+
+[Dr init] Elapsed real time: 0:00:00 
+[Dr init] Elapsed cpu  time: sys=0:00:00 usr=0:00:00 total=0:00:00
+[Dr init] Stage (MB): Used    0  Alloctr    0  Proc    0 
+[Dr init] Total (MB): Used    0  Alloctr    0  Proc 8129 
+Total number of nets = 1138, of which 0 are not extracted
+Total number of open nets = 0, of which 0 are frozen
+Information: Using 1 threads for routing. (ZRT-444)
+Start DR iteration 0: uniform partition
+Routed	1/36 Partitions, Violations =	19
+Routed	2/36 Partitions, Violations =	25
+Routed	3/36 Partitions, Violations =	24
+Routed	4/36 Partitions, Violations =	10
+Routed	5/36 Partitions, Violations =	17
+Routed	6/36 Partitions, Violations =	13
+Routed	7/36 Partitions, Violations =	10
+Routed	8/36 Partitions, Violations =	8
+Routed	9/36 Partitions, Violations =	6
+Routed	10/36 Partitions, Violations =	12
+Routed	11/36 Partitions, Violations =	12
+Routed	12/36 Partitions, Violations =	15
+Routed	13/36 Partitions, Violations =	8
+Routed	14/36 Partitions, Violations =	11
+Routed	15/36 Partitions, Violations =	15
+Routed	16/36 Partitions, Violations =	24
+Routed	17/36 Partitions, Violations =	23
+Routed	18/36 Partitions, Violations =	27
+Routed	19/36 Partitions, Violations =	25
+Routed	20/36 Partitions, Violations =	21
+Routed	21/36 Partitions, Violations =	21
+Routed	22/36 Partitions, Violations =	18
+Routed	23/36 Partitions, Violations =	8
+Routed	24/36 Partitions, Violations =	9
+Routed	25/36 Partitions, Violations =	9
+Routed	26/36 Partitions, Violations =	5
+Routed	27/36 Partitions, Violations =	1
+Routed	28/36 Partitions, Violations =	2
+Routed	29/36 Partitions, Violations =	2
+Routed	30/36 Partitions, Violations =	2
+Routed	31/36 Partitions, Violations =	2
+Routed	32/36 Partitions, Violations =	2
+Routed	33/36 Partitions, Violations =	2
+Routed	34/36 Partitions, Violations =	1
+Routed	35/36 Partitions, Violations =	0
+Routed	36/36 Partitions, Violations =	0
+
+DRC-SUMMARY:
+	@@@@@@@ TOTAL VIOLATIONS =	0
+
+Information: The app option "route.detail.report_soft_drc_separately" will be on-by-default in future release. (ZRT-807)
+	@@@@@@@ TOTAL SOFT VIOLATIONS =	0
+
+[Iter 0] Elapsed real time: 0:00:01 
+[Iter 0] Elapsed cpu  time: sys=0:00:00 usr=0:00:01 total=0:00:01
+[Iter 0] Stage (MB): Used    0  Alloctr    0  Proc    0 
+[Iter 0] Total (MB): Used    0  Alloctr    0  Proc 8129 
+
+End DR iteration 0 with 36 parts
+
+Start DR iteration 1: non-uniform partition
+Routed	1/1 Partitions, Violations =	0
+
+DRC-SUMMARY:
+	@@@@@@@ TOTAL VIOLATIONS =	0
+
+Information: The app option "route.detail.report_soft_drc_separately" will be on-by-default in future release. (ZRT-807)
+	@@@@@@@ TOTAL SOFT VIOLATIONS =	0
+
+[Iter 1] Elapsed real time: 0:00:01 
+[Iter 1] Elapsed cpu  time: sys=0:00:00 usr=0:00:01 total=0:00:01
+[Iter 1] Stage (MB): Used    0  Alloctr    0  Proc    0 
+[Iter 1] Total (MB): Used    0  Alloctr    0  Proc 8129 
+
+End DR iteration 1 with 1 parts
+
+Finish DR since reached 0 DRC
+
+[DR] Elapsed real time: 0:00:01 
+[DR] Elapsed cpu  time: sys=0:00:00 usr=0:00:01 total=0:00:01
+[DR] Stage (MB): Used    0  Alloctr    0  Proc    0 
+[DR] Total (MB): Used    0  Alloctr    0  Proc 8129 
+[DR: Done] Elapsed real time: 0:00:01 
+[DR: Done] Elapsed cpu  time: sys=0:00:00 usr=0:00:01 total=0:00:01
+[DR: Done] Stage (MB): Used    0  Alloctr    0  Proc    0 
+[DR: Done] Total (MB): Used    0  Alloctr    0  Proc 8129 
+
+DR finished with 0 open nets, of which 0 are frozen
+
+DR finished with 0 violations
+
+DRC-SUMMARY:
+	@@@@@@@ TOTAL VIOLATIONS =	0
+
+Information: The app option "route.detail.report_soft_drc_separately" will be on-by-default in future release. (ZRT-807)
+	@@@@@@@ TOTAL SOFT VIOLATIONS =	0
+
+
+
+Total Wire Length =                    34390 micron
+Total Number of Contacts =             7003
+Total Number of Wires =                6445
+Total Number of PtConns =              796
+Total Number of Routed Wires =       6374
+Total Routed Wire Length =           34251 micron
+Total Number of Routed Contacts =       7003
+	Layer              METAL1 :        930 micron
+	Layer              METAL2 :      16420 micron
+	Layer              METAL3 :      15511 micron
+	Layer              METAL4 :       1390 micron
+	Layer              METAL5 :          0 micron
+	Via         V34_X_V1S1E11 :        156
+	Via         V23_X_V1S1E11 :       3270
+	Via        V23_HH_V1S1E11 :          1
+	Via         V12_X_V1S1E11 :       3078
+	Via    V12_X_V1S1E11(rot) :         14
+	Via        V12_HH_V1S1E11 :         15
+	Via   V12_HH_V1S1E11(rot) :        469
+
+ 
+Redundant via conversion report:
+--------------------------------
+
+  Total optimized via conversion rate =  0.00% (0 / 7003 vias)
+ 
+    Layer VIA1       =  0.00% (0      / 3576    vias)
+        Un-optimized =  0.00% (0       vias)
+        Un-mapped    = 100.00% (3576    vias)
+    Layer VIA2       =  0.00% (0      / 3271    vias)
+        Un-optimized =  0.00% (0       vias)
+        Un-mapped    = 100.00% (3271    vias)
+    Layer VIA3       =  0.00% (0      / 156     vias)
+        Un-optimized =  0.00% (0       vias)
+        Un-mapped    = 100.00% (156     vias)
+ 
+  Total double via conversion rate    =  0.00% (0 / 7003 vias)
+ 
+    Layer VIA1       =  0.00% (0      / 3576    vias)
+    Layer VIA2       =  0.00% (0      / 3271    vias)
+    Layer VIA3       =  0.00% (0      / 156     vias)
+ 
+  The optimized via conversion rate based on total routed via count =  0.00% (0 / 7003 vias)
+ 
+    Layer VIA1       =  0.00% (0      / 3576    vias)
+        Un-optimized =  0.00% (0       vias)
+        Un-mapped    = 100.00% (3576    vias)
+    Layer VIA2       =  0.00% (0      / 3271    vias)
+        Un-optimized =  0.00% (0       vias)
+        Un-mapped    = 100.00% (3271    vias)
+    Layer VIA3       =  0.00% (0      / 156     vias)
+        Un-optimized =  0.00% (0       vias)
+        Un-mapped    = 100.00% (156     vias)
+ 
+
+Total number of nets = 1138
+0 open nets, of which 0 are frozen
+Total number of excluded ports = 0 ports of 0 unplaced cells connected to 0 nets
+                                 0 ports without pins of 0 cells connected to 0 nets
+                                 0 ports of 0 cover cells connected to 0 non-pg nets
+Total number of DRCs = 0
+Total number of antenna violations = antenna checking not active
+Total number of DRCs on METAL3 and below = 0 
+Information: Routes in non-preferred voltage areas = 0 (ZRT-559)
+
+Updating the database ...
+Information: Extraction observers are detached as design net change threshold is reached.
+
+Information: Runtime Summary (route_auto)  (FLW-9000)
+----------------------------------------------------------------------------
+    Elapse (Hrs)   Elapse (%)       CPU/Elapse       Category
+----------------------------------------------------------------------------
+      0.00           48.3%             1.0           Detail Route 
+      0.00           24.7%             1.0           Track Assignment 
+      0.00           22.4%             1.0           Global Route 
+      0.00            4.1%             1.0           Other 
+      0.00            0.4%             1.0           Via Ladder 
+----------------------------------------------------------------------------
+      0.00          100.0%             1.0           Total 
+----------------------------------------------------------------------------
+
+Host Options:
+-------------
+Max cores: 1
+
+Machine Spec:
+-------------
+Intel(R) Xeon(R) D-2123IT CPU @ 2.20GHz / 8 CPUs  
+Sockets: 1, Cores: 4, HT/SMT, not-VM
+----------------------------------------------------------------------------
+
+Information: Ending   'route_auto' (FLW-8001)
+Information: Time: 2026-10-26 15:33:45 / Session:  00:01:33 / Command:  00:00:04 / CPU:  00:00:03 / Memory: 899 MB (FLW-8100)
+catch {route_opt}
+Information: Starting 'route_opt' (FLW-8000)
+Information: Time: 2026-10-26 15:33:45 / Session:  00:01:33 / Command:  00:00:00 / CPU:  00:00:00 / Memory: 899 MB (FLW-8100)
+INFO: route_opt is running in balanced flow mode
+INFO: Cost Function Configuration 0.5/0.5/0.5/0.5/0.9/1.0
+Warning: SI analysis is not enabled for post-route optimization. (ROPT-002)
+Warning: Cannot find any default max transition constraint on the design. (OPT-070)
+INFO: Total Power Aware Optimization Enabled (Dynamic + Leakage)
+Route-opt command begin                   CPU:    27 s (  0.01 hr )  ELAPSE:    93 s (  0.03 hr )  MEM-PEAK:   898 MB
+Warning: SI analysis is not enabled for post-route optimization. (ROPT-002)
+Warning: Cannot find any default max transition constraint on the design. (OPT-070)
+INFO: route_opt is running with flow.common.io_priority high.
+INFO: place.legalize.enable_advanced_legalizer not set - need to revert CLO
+INFO: Concurrent Legalization and Optimization (CLO) Reverted
+INFO: place.legalize.enable_advanced_legalizer not set - need to revert CLO
+[Tim-Power] Info: Enabling unified Timing-Power architecture for rest of the flow. 
+Warning: no valid parasitic for typical corner(LATE) (NEX-018)
+Warning: no valid parasitic for typical corner(EARLY) (NEX-018)
+Warning: no valid parasitic for (all corners) corner((both specs)) (NEX-018)
+Information: The stitching and editing of coupling caps is turned OFF for design 'alu_wrapper_lib.ndm:alu_wrapper.design'. (TIM-125)
+Warning: The extractor can not be initialized for block 'alu_wrapper'. (TIM-103)
+Warning: The extractor can not be initialized for design 'alu_wrapper'. Zero interconnect delay is used in timing analysis. (TIM-102)
+Warning: Batch extraction is skipped for block "alu_wrapper"
+Information: Activity propagation will be performed for scenario func_typical.
+Information: Doing activity propagation for mode 'func' and corner 'typical' with effort level 'medium'. (POW-024)
+Information: Timer-derived activity data is cached on scenario func_typical (POW-052)
+Information: Running switching activity propagation in scalar mode!
+
+ **** Information : No. of simulation cycles = 6 ****
+Information: Update timing completed net estimation for all the timing graph nets (TIM-111)
+Information: Net estimation statistics: timing graph nets = 1136, routed nets = 0, across physical hierarchy nets = 0, parasitics cached nets = 0, delay annotated nets = 0, parasitics annotated nets = 0, multi-voltage nets = 0. (TIM-112)
+[Non-Incremental Power-Update] SCENE[func_typical_late] PROP[late] InstanceSize[1088]
+Info: update em.
+
+Route-opt timing update complete          CPU:    28 s (  0.01 hr )  ELAPSE:    94 s (  0.03 hr )  MEM-PEAK:   898 MB
+INFO: Propagating Switching Activities
+Information: Activity for scenario func_typical was cached, no propagation required. (POW-005)
+INFO: Switching Activity propagation took     0.00004 sec
+INFO: Propagating Switching Activity for all power flows 
+
+Route-opt initial QoR
+_____________________
+Scenario Mapping Table
+1: func_typical
+
+Pathgroup Mapping Table
+1: **default**
+2: **async_default**
+3: **clock_gating_default**
+4: **in2reg_default**
+5: **reg2out_default**
+6: **in2out_default**
+7: clk
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------
+PATHGROUP QOR 
+-------------------------------------------------------------------------------------------------------------------------------------------------------------
+Scene  PG      WNS        TNS    NSV      WHV        THV    NHV
+    1   1   0.0000     0.0000      0   0.0000     0.0000      0
+    1   2   0.0000     0.0000      0   0.0000     0.0000      0
+    1   3   0.0000     0.0000      0   0.0000     0.0000      0
+    1   4   0.0000     0.0000      0   0.8182    46.4195     58
+    1   5   9.4356    31.1614      9   0.0000     0.0000      0
+    1   6   0.0000     0.0000      0   0.0000     0.0000      0
+    1   7   4.5145   180.1035     58   0.0000     0.0000      0
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+SCENARIO QOR 
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Scene  PG      WNS        TNS   R2RTNS    NSV      WHV        THV    NHV  MaxTrnV   MaxTranC  MaxCapV    Leakage
+    1   *   9.4356   211.2649 180.1035     67   0.8182    46.4195     58        0     0.0000        0    766.447
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+DESIGN QOR 
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Scene  PG      WNS        TNS   R2RTNS    NSV      WHV        THV    NHV  MaxTrnV   MaxTranC  MaxCapV    Leakage         Area    InstCnt
+    *   *   9.4356   211.2649 180.1035     67   0.8182    46.4195     58        0     0.0000        0    766.447     22077.62       1088
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Route-opt initial QoR Summary       WNS        TNS   R2RTNS    NSV      WHV        THV    NHV  MaxTrnV  MaxCapV    Leakage         Area    InstCnt
+Route-opt initial QoR Summary    9.4356   211.2649 180.1035     67   0.8182    46.4195     58        0        0    766.447     22077.62       1088
+Information: Activity for scenario func_typical was cached, no propagation required. (POW-005)
+Information: The netlist change observers are disabled for incremental extraction. (TIM-126)
+INFO: using 1 threads
+Information: Activity for scenario func_typical was cached, no propagation required. (POW-005)
+Warning: The extractor can not be initialized for design 'alu_wrapper'. Zero interconnect delay is used in timing analysis. (TIM-102)
+Warning: no valid parasitic for typical corner(LATE) (NEX-018)
+Warning: no valid parasitic for typical corner(EARLY) (NEX-018)
+Warning: no valid parasitic for (all corners) corner((both specs)) (NEX-018)
+Warning: The extractor can not be initialized for design 'alu_wrapper'. Zero interconnect delay is used in timing analysis. (TIM-102)
+Warning: no valid parasitic for typical corner(LATE) (NEX-018)
+Warning: no valid parasitic for typical corner(EARLY) (NEX-018)
+Warning: no valid parasitic for (all corners) corner((both specs)) (NEX-018)
+Warning: no valid parasitic for (all corners) corner((both specs)) (NEX-018)
+Warning: no valid parasitic for typical corner(LATE) (NEX-018)
+Warning: no valid parasitic for typical corner(EARLY) (NEX-018)
+Warning: no valid parasitic for (all corners) corner((both specs)) (NEX-018)
+Information: Activity for scenario func_typical was cached, no propagation required. (POW-005)
+Route-opt initialization complete         CPU:    31 s (  0.01 hr )  ELAPSE:    97 s (  0.03 hr )  MEM-PEAK:   898 MB
+Route-opt optimization summary            SETUP-COST    R2R-COST HOLD-COST LDRC-COST          AREA     LEAKAGE     INSTCNT            ELAPSE       MEM
+Information: Initializing classic cellmap without advanced rules enabled and with PDC enabled
+Information: The following app options are used in cellmap
+        place.legalize.enable_color_aware_placement : false
+        place.legalize.use_nll_query_cm : false
+        place.legalize.enable_advanced_legalizer : false
+        place.legalize.enable_prerouted_net_check : true
+        place.legalize.enable_advanced_prerouted_net_check : false
+        place.legalize.always_continue : true
+        place.legalize.limit_legality_checks : false
+        place.common.pnet_aware_density : 1.0000
+        place.common.pnet_aware_min_width : 0.0000
+        place.common.pnet_aware_layers : {}
+        place.common.use_placement_model : false
+        place.common.enable_advanced_placement_model : true
+        cts.placement.cell_spacing_rule_style : maximum
+Information: Creating classic rule checker.
+Warning: Routing direction of metal layer POLY2 is neither "horizontal" nor "vertical".  PDC checks will not be performed on this layer. (PDC-003)
+PDC app_options settings =========
+	place.legalize.enable_prerouted_net_check: 1
+	place.legalize.num_tracks_for_access_check: 1
+	place.legalize.use_eol_spacing_for_access_check: 0
+	place.legalize.allow_touch_track_for_access_check: 1
+	place.legalize.reduce_conservatism_in_eol_check: 0
+	place.legalize.preroute_shape_merge_distance: 0.0
+	place.legalize.enable_non_preferred_direction_span_check: 0
+
+Layer METAL1: cached 0 shapes out of 619 total shapes.
+Layer METAL2: cached 0 shapes out of 4497 total shapes.
+Cached 0 vias out of 7003 total vias.
+Total 0.0187 seconds to build cellmap data
+INFO: creating 19(r) x 20(c) GridCells YDim 10.08 XDim 10.08
+INFO: number of GridCells (alu_wrapper): 380
+INFO: creating 19(r) x 20(c) GridCells YDim 10.08 XDim 10.08
+INFO: number of GridCells (alu_wrapper): 380
+Total 0.0301 seconds to load 1088 cell instances into cellmap
+Moveable cells: 1088; Application fixed cells: 0; Macro cells: 0; User fixed cells: 0
+1135 out of 1135 data nets are detail routed, 1 out of 1 clock nets is detail routed and total 1136 nets have been analyzed
+Estimated current stage is after clock and data detail route stage
+Average cell width 6.0393, cell height 3.3600, cell area 20.2919 for total 1088 placed and application fixed cells
+Information: Activity for scenario func_typical was cached, no propagation required. (POW-005)
+Warning: No parasitic data is present for any scenarios. (ROPT-005)
+Warning: no valid parasitic for typical corner( LATE) (NEX-018)
+Warning: no valid parasitic for typical corner( EARLY) (NEX-018)
+Error: Design has atleast one corner with no Parasitic information. (OPT-906)
+Warning: Cannot find any default max transition constraint on the design. (OPT-070)
+Information: Activity for scenario func_typical was cached, no propagation required. (POW-005)
+Information: Activity for scenario func_typical was cached, no propagation required. (POW-005)
+[Tim-Power] Info: Destroyed power manager, requires activity propagation and power calculation during next update.
+Information: Activity propagation will be performed for scenario func_typical.
+Information: Doing activity propagation for mode 'func' and corner 'typical' with effort level 'medium'. (POW-024)
+Information: Timer-derived activity data is cached on scenario func_typical (POW-052)
+Information: Running switching activity propagation in scalar mode!
+
+ **** Information : No. of simulation cycles = 6 ****
+[Non-Incremental Power-Update] SCENE[func_typical_late] PROP[late] InstanceSize[1088]
+
+Route-opt optimization complete               302.53      257.91     49.02         -      22077.62      766.45        1088              0.03       898
+
+Route-opt final QoR
+___________________
+Scenario Mapping Table
+1: func_typical
+
+Pathgroup Mapping Table
+1: **default**
+2: **async_default**
+3: **clock_gating_default**
+4: **in2reg_default**
+5: **reg2out_default**
+6: **in2out_default**
+7: clk
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------
+PATHGROUP QOR 
+-------------------------------------------------------------------------------------------------------------------------------------------------------------
+Scene  PG      WNS        TNS    NSV      WHV        THV    NHV
+    1   1   0.0000     0.0000      0   0.0000     0.0000      0
+    1   2   0.0000     0.0000      0   0.0000     0.0000      0
+    1   3   0.0000     0.0000      0   0.0000     0.0000      0
+    1   4   0.0000     0.0000      0   0.8182    46.4195     58
+    1   5   9.4356    31.1614      9   0.0000     0.0000      0
+    1   6   0.0000     0.0000      0   0.0000     0.0000      0
+    1   7   4.5145   180.1035     58   0.0000     0.0000      0
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+SCENARIO QOR 
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Scene  PG      WNS        TNS   R2RTNS    NSV      WHV        THV    NHV  MaxTrnV   MaxTranC  MaxCapV    Leakage
+    1   *   9.4356   211.2649 180.1035     67   0.8182    46.4195     58        0     0.0000        0    766.447
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+DESIGN QOR 
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Scene  PG      WNS        TNS   R2RTNS    NSV      WHV        THV    NHV  MaxTrnV   MaxTranC  MaxCapV    Leakage         Area    InstCnt
+    *   *   9.4356   211.2649 180.1035     67   0.8182    46.4195     58        0     0.0000        0    766.447     22077.62       1088
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Route-opt final QoR Summary         WNS        TNS   R2RTNS    NSV      WHV        THV    NHV  MaxTrnV  MaxCapV    Leakage         Area    InstCnt
+Route-opt final QoR Summary      9.4356   211.2649 180.1035     67   0.8182    46.4195     58        0        0    766.447     22077.62       1088
+
+Route-opt command complete                CPU:    32 s (  0.01 hr )  ELAPSE:    98 s (  0.03 hr )  MEM-PEAK:   898 MB
+Route-opt command statistics  CPU=5 sec (0.00 hr) ELAPSED=5 sec (0.00 hr) MEM-PEAK=0.877 GB
+Information: The netlist change observers are enabled for incremental extraction. (TIM-127)
+[Tim-Power] Info: Destroyed power manager, requires activity propagation and power calculation during next update.
+Information: Activity propagation will be performed for scenario func_typical.
+Information: Doing activity propagation for mode 'func' and corner 'typical' with effort level 'medium'. (POW-024)
+Information: Timer-derived activity data is cached on scenario func_typical (POW-052)
+Information: Running switching activity propagation in scalar mode!
+
+ **** Information : No. of simulation cycles = 6 ****
+[Non-Incremental Power-Update] SCENE[func_typical_late] PROP[late] InstanceSize[1088]
+
+Information: Runtime Summary (route_opt)  (FLW-9000)
+----------------------------------------------------------------------------
+    Elapse (Hrs)   Elapse (%)       CPU/Elapse       Category
+----------------------------------------------------------------------------
+      0.00          100.0%             1.0           Other 
+----------------------------------------------------------------------------
+      0.00          100.0%             1.0           Total 
+----------------------------------------------------------------------------
+
+Host Options:
+-------------
+Max cores: 1
+
+Machine Spec:
+-------------
+Intel(R) Xeon(R) D-2123IT CPU @ 2.20GHz / 8 CPUs  
+Sockets: 1, Cores: 4, HT/SMT, not-VM
+----------------------------------------------------------------------------
+
+Information: Ending   'route_opt' (FLW-8001)
+Information: Time: 2026-10-26 15:33:50 / Session:  00:01:38 / Command:  00:00:05 / CPU:  00:00:05 / Memory: 899 MB (FLW-8100)
+1
+conectar_pg
+Information: Connecting to PG and tie pins in automatic mode. (MV-396)
+****************************************
+Report : Power/Ground Connection Summary
+Design : alu_wrapper
+Version: Y-2026.03-SP2
+Date   : Mon Oct 26 15:33:50 2026
+****************************************
+P/G net name                  P/G pin count(previous/current)
+--------------------------------------------------------------------------------
+Power net VDD                 1088/1088
+Ground net VSS                1088/1088
+--------------------------------------------------------------------------------
+Information: connections of 0 power/ground pin(s) are created or changed. (MV-382)
+
+0
+report_qor > reports/icc2_4_route_opt_qor.rpt
+check_legality -verbose > reports/icc2_check_legality.rpt
+write_gds outputs/${DESIGN_NAME}.gds
+1
+write_verilog outputs/${DESIGN_NAME}_post_route.v
+1
+save_lib
+Information: The command 'save_lib' cleared the undo history. (UNDO-016)
+Saving library 'alu_wrapper_lib.ndm'
+1
+exit
+Maximum memory usage for this session: 898.68 MB
+Maximum memory usage for this session including child processes: 898.68 MB
+CPU usage for this session:     32 seconds (  0.01 hours)
+Elapsed time for this session:     98 seconds (  0.03 hours)
+Thank you for using IC Compiler II.

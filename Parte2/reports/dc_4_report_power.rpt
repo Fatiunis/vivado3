@@ -1,0 +1,58 @@
+ 
+****************************************
+Report : power
+        -analysis_effort low
+Design : alu_wrapper
+Version: X-2025.06-SP5-5
+Date   : Mon Oct 26 15:31:55 2026
+****************************************
+
+
+Library(s) Used:
+
+    M31LLSC750GL150MS_25CTT1P8_ctyp_ccs (File: /home/framazzini/mi_proyecto_asic/pdk/M31LLSC750GL150MS_00.01.000-20261022T233445Z-1-001/M31LLSC750GL150MS_00.01.000/ccs_db/M31LLSC750GL150MS_25CTT1P8_ctyp_ccs.db)
+
+
+Operating Conditions: 25CTT1P8   Library: M31LLSC750GL150MS_25CTT1P8_ctyp_ccs
+Wire Load Model Mode: enclosed
+
+Design        Wire Load Model            Library
+------------------------------------------------
+alu_wrapper            MW0K              M31LLSC750GL150MS_25CTT1P8_ctyp_ccs
+
+
+Global Operating Voltage = 1.8  
+Power-specific unit information :
+    Voltage Units = 1V
+    Capacitance Units = 1.000000pf
+    Time Units = 1ns
+    Dynamic Power Units = 1mW    (derived from V,C,T units)
+    Leakage Power Units = 1pW
+
+
+Attributes
+----------
+i - Including register clock pin internal power
+
+
+  Cell Internal Power  = 841.8068 uW   (84%)
+  Net Switching Power  = 163.2167 uW   (16%)
+                         ---------
+Total Dynamic Power    =   1.0050 mW  (100%)
+
+Cell Leakage Power     = 766.1920 pW
+
+
+                 Internal         Switching           Leakage            Total
+Power Group      Power            Power               Power              Power   (   %    )  Attrs
+--------------------------------------------------------------------------------------------------
+io_pad             0.0000            0.0000            0.0000            0.0000  (   0.00%)
+memory             0.0000            0.0000            0.0000            0.0000  (   0.00%)
+black_box          0.0000            0.0000            0.0000            0.0000  (   0.00%)
+clock_network      0.5744            0.0000            0.0000            0.5744  (  57.15%)  i
+register       9.1257e-02        3.4049e-02          208.5499            0.1253  (  12.47%)
+sequential         0.0000            0.0000            0.0000            0.0000  (   0.00%)
+combinational      0.1762            0.1292          557.6422            0.3054  (  30.38%)
+--------------------------------------------------------------------------------------------------
+Total              0.8418 mW         0.1632 mW       766.1920 pW         1.0050 mW
+1

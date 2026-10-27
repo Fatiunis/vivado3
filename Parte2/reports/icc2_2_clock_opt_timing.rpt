@@ -1,0 +1,63 @@
+Information: The stitching and editing of coupling caps is turned OFF for design 'alu_wrapper_lib.ndm:alu_wrapper.design'. (TIM-125)
+Warning: The extractor can not be initialized for block 'alu_wrapper'. (TIM-103)
+Warning: The extractor can not be initialized for design 'alu_wrapper'. Zero interconnect delay is used in timing analysis. (TIM-102)
+Warning: Batch extraction is skipped for block "alu_wrapper"
+Information: Update timing completed net estimation for all the timing graph nets (TIM-111)
+Information: Net estimation statistics: timing graph nets = 1136, routed nets = 0, across physical hierarchy nets = 0, parasitics cached nets = 0, delay annotated nets = 0, parasitics annotated nets = 0, multi-voltage nets = 0. (TIM-112)
+****************************************
+Report : timing
+        -path_type full
+        -delay_type max
+        -max_paths 1
+        -report_by design
+Design : alu_wrapper
+Version: Y-2026.03-SP2
+Date   : Mon Oct 26 15:33:41 2026
+****************************************
+
+  Startpoint: mult_x_2_R_351 (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: flags_out[2] (output port clocked by clk)
+  Mode: func
+  Corner: typical
+  Scenario: func_typical
+  Path Group: **reg2out_default**
+  Path Type: max
+
+  Point                                            Incr      Path  
+  ------------------------------------------------------------------------
+  clock clk (rise edge)                            0.00      0.00
+  clock network delay (propagated)                 0.00      0.00
+
+  mult_x_2_R_351/CK (DFFRBQX2TAS7)                 0.00      0.00 r
+  mult_x_2_R_351/Q (DFFRBQX2TAS7)                  2.33      2.33 r
+  U660/O (XOR2X1TAS7)                              1.59      3.92 f
+  U473/O (XNOR2X1TAS7)                             1.59      5.51 r
+  U470/O (NAND2X1TAS7)                             0.51      6.02 f
+  U405/O (OAI12B2X2TAS7)                           0.69      6.71 r
+  U583/O (XNOR2X1TAS7)                             1.85      8.56 f
+  U669/O (NAND2B1X2TAS7)                           0.49      9.05 r
+  U670/O (OAI112X2TAS7)                            0.45      9.50 f
+  U718/O (NOR3X1TAS7)                              1.37     10.87 r
+  U719/O (NAND4B1X1TAS7)                           0.87     11.75 f
+  U720/O (NOR3X1TAS7)                              1.48     13.23 r
+  U721/O (NAND2X1TAS7)                             0.51     13.74 f
+  U722/O (NAND2B1X1TAS7)                           0.80     14.53 f
+  U581/O (NAND4B1X1TAS7)                           1.09     15.63 f
+  U580/O (CLKINVX1TAS7)                            0.51     16.14 r
+  U590/O (AND4X1TAS7)                              1.10     17.24 r
+  flags_out[2] (out)                               0.00     17.24 r
+  data arrival time                                         17.24
+
+  clock clk (rise edge)                           10.00     10.00
+  clock network delay (propagated)                 0.00     10.00
+  clock uncertainty                               -0.20      9.80
+  output external delay                           -2.00      7.80
+  data required time                                         7.80
+  ------------------------------------------------------------------------
+  data required time                                         7.80
+  data arrival time                                        -17.24
+  ------------------------------------------------------------------------
+  slack (VIOLATED)                                          -9.44
+
+
+1
